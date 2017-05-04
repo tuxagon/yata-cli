@@ -5,7 +5,7 @@ import (
 	"os"
 	//"flag"
 	"fmt"
-	"reflect"
+	"path"
 )
 
 const (
@@ -23,49 +23,28 @@ type Config struct {
 	TodoDir string `default:"tasks"`
 }
 
-func LoadConfig(v interface{}) error {
-	ptrRef := reflect.ValueOf(v)
-	if ptrRef.Kind() != reflect.Ptr {
-		return ErrConfigNotLoaded
+func GetHomeEnv() string {
+	val, ok := os.LookupEnv("HOME")
+	if ok {
+		return val
 	}
-
-	ref := ptrRef.Elem()
-	if ref.Kind() != reflect.Struct {
-		return ErrConfigNotLoaded
-	}
-
-	refType := ref.Type()
-	for i := 0; i < refType.NumField(); i++ {
-		field := refType.Field(i)
-		fmt.Printf("%d. %v (%v), tag: '%v'\n", i+1, field.Name, field.Type.Name())
-	}
-	return nil
+	panic(errors.New("Expected 'HOME' environment variable"))
 }
 
-func DisplayTag(v interface{}) {
-	t := reflect.TypeOf(v)
-
-	val := reflect.ValueOf(v)
-	fmt.Println("ValueOf:", val.Type())
-
-	fmt.Println("Type:", t.Name())
-	fmt.Println("Kind:", t.Kind())
-
-	for i := 0; i < val.Type().NumField(); i++ {
-		field := val.Type().Field(i)
-		tag := field.Tag.Get(envTag)
-		fmt.Printf("%d. %v (%v), tag: '%v'\n", i+1, field.Name, field.Type.Name(), tag)
-		tag = field.Tag.Get(defaultTag)
-		fmt.Printf("%d. %v (%v), tag: '%v'\n", i+1, field.Name, field.Type.Name(), tag)
+func GetOr(key, fallback string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		return fallback
 	}
+	return val
 }
 
 func main() {
-	cfg := Config{}
-	err := LoadConfig(&cfg)
+	home := GetHomeEnv()
+	rootPath := path.Join(home, ".yata")
+	_, err := os.Stat(rootPath)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		os.Mkdir(rootPath, 0777)
 	}
 
 	if len(os.Args) <= 1 {
