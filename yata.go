@@ -1,11 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
-	"os"
-	//"flag"
 	"fmt"
+	"os"
 	"path"
+	"time"
 )
 
 const (
@@ -21,6 +22,23 @@ type Config struct {
 	Home    string `env:"HOME"`
 	BaseDir string `default:".todo"`
 	TodoDir string `default:"tasks"`
+}
+
+type MaybeTime struct {
+	Time  time.Time
+	Valid bool
+}
+
+type YataConfig struct {
+	BaseDir string
+}
+
+type YataTask struct {
+	Description string //`json:"desc"`
+	//created     time.Time `json:"created"`
+	//completed   MaybeTime `json:"done"`
+	Priority int    //`json:"priority"`
+	Project  string //`json:"project"`
 }
 
 func GetHomeEnv() string {
@@ -39,14 +57,26 @@ func GetOr(key, fallback string) string {
 	return val
 }
 
-func main() {
-	home := GetHomeEnv()
-	rootPath := path.Join(home, ".yata")
+func CreateRoot(rootPath string) {
 	_, err := os.Stat(rootPath)
 	if err != nil {
 		os.Mkdir(rootPath, 0777)
 	}
+}
 
+func CreateMainFile(rootPath, filename string) {
+	fullPath := path.Join(rootPath, filename)
+	_, err := os.Stat(fullPath)
+	if err != nil {
+		os.Create(fullPath)
+	}
+}
+
+func main() {
+	home := GetHomeEnv()
+	rootPath := path.Join(home, ".yata")
+	CreateRoot(rootPath)
+	CreateMainFile(rootPath, "yata")
 	if len(os.Args) <= 1 {
 		// TODO Show usage
 		os.Exit(1)
@@ -69,6 +99,12 @@ func main() {
 
 	switch args[0] {
 	case "add", "new":
+		simpleTask := &YataTask{"This is my first task", 2, "test"}
+		t, err := json.Marshal(simpleTask)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(string(t))
 		fmt.Println("New todo!")
 	case "config":
 		fmt.Println("Configuring")
