@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 )
 
 const (
@@ -46,6 +47,13 @@ type YataTask struct {
 	Project     string `json:"project"`
 }
 
+// ByPriority implements sort.Interface for []YataTask based on the Priority field
+type ByPriority []YataTask
+
+func (t ByPriority) Len() int           { return len(t) }
+func (t ByPriority) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+func (t ByPriority) Less(i, j int) bool { return t[i].Priority < t[j].Priority }
+
 // NewSimpleYataTask creates a new Yata task with defaults
 func NewSimpleYataTask(description, project string) *YataTask {
 	return &YataTask{
@@ -77,12 +85,17 @@ func NewHighPriorityYataTask(description, project string) *YataTask {
 }
 
 // MarshalTask marshals the task into json bytes
-func (t *YataTask) MarshalTask() []byte {
-	json, err := json.Marshal(*t)
+func (t YataTask) MarshalTask() []byte {
+	json, err := json.Marshal(t)
 	if err != nil {
 		log.Fatal(errors.New("Unable to marshal task"))
 	}
 	return json
+}
+
+// String returns a string representation of a Yata task
+func (t YataTask) String() string {
+	return fmt.Sprintf("%s", t.Description)
 }
 
 // NewYataManager creates a new Yata manager
@@ -165,9 +178,34 @@ func EitherString(s1, s2 string) string {
 	return s1
 }
 
+// YataCmd declares functions that are implemented by each Yata command
+type YataCmd interface {
+	ParseOpts(args []string)
+	Handle()
+}
+
+// ListCmd represents all the information regarding a list command
+type ListCmd struct {
+	Manager *YataManager
+}
+
+// ParseOpts TODO
+func (cmd *ListCmd) ParseOpts(args []string) {
+
+}
+
+// Handle TODO
+func (cmd ListCmd) Handle() {
+	tasks := cmd.Manager.GetAllOpenTasks()
+	sort.Sort(ByPriority(tasks))
+	for _, t := range tasks {
+		fmt.Println(t)
+	}
+}
+
 func SeedFile(m *YataManager) {
-	t1 := NewSimpleYataTask("Task 1", "")
-	t2 := NewSimpleYataTask("Task 2", "")
+	t1 := NewHighPriorityYataTask("Task 1", "")
+	t2 := NewLowPriorityYataTask("Task 2", "")
 	t3 := NewSimpleYataTask("Task 3", "")
 	m.SaveNewTask(*t1)
 	m.SaveNewTask(*t2)
@@ -177,9 +215,7 @@ func SeedFile(m *YataManager) {
 func main() {
 	ym := NewYataManager()
 	ym.InitializeDirectory()
-	SeedFile(ym)
-	tasks := ym.GetAllOpenTasks()
-	fmt.Printf("%+v", tasks)
+	//SeedFile(ym)
 
 	if len(os.Args) <= 1 {
 		// TODO Show usage
@@ -187,33 +223,14 @@ func main() {
 	}
 	args := os.Args[1:]
 
-	// home := os.Getenv("HOME")
-	// if home == "" {
-	// 	home = ""
-	// }
-	// todoRoot := os.Getenv("TODO_ROOT")
-	// if todoRoot == "" {
-	// 	todoRoot = ""
-	// }
-
-	// fmt.Println("type:", reflect.ValueOf(&cfg).Elem().Type().Field(0).Tag.Get("env"))
-	// err := Parse(1)
-	// fmt.Println(err)
-	//DisplayTag(&cfg)
-
 	switch args[0] {
 	case "add", "new":
-		//simpleTask := &YataTask{"This is my first task", 2, "test"}
-		//t, err := json.Marshal(simpleTask)
-		//if err != nil {
-		//	fmt.Println(err)
-		//}
-		//fmt.Println(string(t))
 		fmt.Println("New todo!")
 	case "config":
 		fmt.Println("Configuring")
 	case "list", "ls":
-		fmt.Println("Listing")
+		cmd := ListCmd{Manager: ym}
+		cmd.Handle()
 	default:
 		fmt.Println("Usage")
 	}
