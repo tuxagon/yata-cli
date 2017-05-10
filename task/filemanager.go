@@ -10,6 +10,8 @@ import (
 )
 
 const (
+	// DefaultProject represents the name of the default project when on is not specified
+	DefaultProject = "__none__"
 	// DefaultFilename represents the name of the default Yata tasks file
 	DefaultFilename = "main"
 )

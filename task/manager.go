@@ -1,8 +1,8 @@
 package task
 
-// TaskManager defines the behavior necessary to persist and manage
+// Manager defines the behavior necessary to persist and manage
 // tasks
-type TaskManager interface {
+type Manager interface {
 	Initialize()
 	GetAllOpenTasks() []Task
 	SaveNewTask(t Task)
