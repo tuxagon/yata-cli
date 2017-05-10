@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"path"
+
+	"github.com/nu7hatch/gouuid"
 )
 
 const (
@@ -85,6 +87,8 @@ func (m *FileManager) GetAllOpenTasks() (tasks []Task) {
 
 // SaveNewTask will save the given task to the Yata file
 func (m *FileManager) SaveNewTask(t Task) {
+	u, _ := uuid.NewV4()
+	t.ID = u.String()
 	tasks := m.GetAllOpenTasks()
 	tasks = append(tasks, t)
 	dat, err := json.Marshal(tasks)

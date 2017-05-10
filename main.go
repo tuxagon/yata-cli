@@ -2,8 +2,10 @@ package main
 
 import (
 	"os"
+	"sort"
+	"yata-cli/cmd"
 
-	"github.com/tuxagon/yata-cli/cmd"
+	//"github.com/tuxagon/yata-cli/cmd"
 	"github.com/tuxagon/yata-cli/debug"
 	"github.com/urfave/cli"
 )
@@ -12,8 +14,9 @@ const (
 	// Version is the current release of the command line app
 	Version = "0.1.0"
 
-	descList = "Lists the tasks/todos"
-	descYata = "A command line task/todo manager"
+	descAdd  = "Adds a new task"
+	descList = "Lists the tasks"
+	descYata = "A command line task manager"
 )
 
 func main() {
@@ -45,6 +48,29 @@ func main() {
 			},
 			Action: cmd.List,
 		},
+		cli.Command{
+			Name:  "add",
+			Usage: descAdd,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "description,desc,d",
+					Usage: "specify the task description",
+				},
+				cli.StringFlag{
+					Name:  "project,proj",
+					Usage: "specify the name of a project for a task",
+				},
+				cli.IntFlag{
+					Name:  "priority,p",
+					Usage: "specify a priority for the task (1: Low, 2: Normal, 3: High)",
+				},
+			},
+			Action: cmd.Add,
+		},
 	}
+
+	sort.Sort(cli.FlagsByName(app.Flags))
+	sort.Sort(cli.CommandsByName(app.Commands))
+
 	app.Run(os.Args)
 }
