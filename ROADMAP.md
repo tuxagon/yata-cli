@@ -6,8 +6,8 @@
 - `[ ]` Change how the list renders {simple,verbose,printf}
 - `[ ]` Prune completed tasks from database/file
 - `[ ]` Allow archiving of tasks based on criteria
-- `[ ]` Add new task with only required fields {description}
-- `[ ]` Handle "autoincrement" for files using `.yataconfig` file
+- `[x]` Add new task with only required fields {description}
+- `[x]` Handle "autoincrement" for files using `.yataconfig` file
 - `[ ]` Allow for task IDs to be transformed before save {prefix,suffix}
 - `[ ]` Allow for task IDs to be UUIDs
 - `[ ]` Show a specific task based on ID
@@ -15,7 +15,7 @@
 - `[ ]` Import tasks from json
 - `[ ]` Tasks are update-able through additions, changes, or deletions
 - `[ ]` Delete tasks
-- `[ ]` Apply tags to any task `#sometag`
+- `[x]` Apply tags to any task `#sometag`
 - `[ ]` Allow filtering based on tag
 - `[ ]` List all tags
 - `[ ]` Mark a task as completed/uncompleted
