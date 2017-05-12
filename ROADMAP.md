@@ -25,5 +25,7 @@
 `[ ]` Command line colors
 `[ ]` File-based and SQLite storage options
 `[ ]` Config file `.yataconfig`
+`[x]` Create a nuclear option to just restart
+`[x]` Create a separate backup file if one already exists
 
 This is not listed in any particular order and some of these are just thoughts and may change or just not get implemented. Roadmap = Braindump right now.

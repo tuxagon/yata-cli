@@ -11,12 +11,14 @@ import (
 )
 
 const (
-	// Version is the current release of the command line app
-	Version = "0.1.0"
+	// Version specifies the current release
+	Version = "1.0.0"
 
-	descAdd  = "Adds a new task"
-	descList = "Lists the tasks"
-	descYata = "A command line task manager"
+	descAdd    = "Create a new task"
+	descConfig = "Manage configuration options"
+	descList   = "Lists the tasks"
+	descReset  = "Erases all existing tasks and starts fresh"
+	descYata   = "A command line task manager"
 )
 
 func main() {
@@ -49,16 +51,17 @@ func main() {
 			Action: cmd.List,
 		},
 		cli.Command{
-			Name:  "add",
-			Usage: descAdd,
+			Name:    "add",
+			Aliases: []string{"new", "create"},
+			Usage:   descAdd,
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "description,desc,d",
-					Usage: "specify the task description",
+					Usage: "specify the task description; tags can be included in description using the '#' prefix in the description text",
 				},
 				cli.StringFlag{
-					Name:  "project,proj",
-					Usage: "specify the name of a project for a task",
+					Name:  "tags,t",
+					Usage: "specify tags outside of the description; list is comma-delimited",
 				},
 				cli.IntFlag{
 					Name:  "priority,p",
@@ -67,10 +70,38 @@ func main() {
 			},
 			Action: cmd.Add,
 		},
+		reset(),
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	app.Run(os.Args)
+}
+
+func config() cli.Command {
+	return cli.Command{
+		Name:        "config",
+		Description: descConfig,
+		Action:      cmd.Config,
+	}
+}
+
+func reset() cli.Command {
+	return cli.Command{
+		Name:        "reset",
+		Description: descReset,
+		Aliases:     []string{"nuke"},
+		Flags: []cli.Flag{
+			cli.BoolFlag{
+				Name:  "no-backup",
+				Usage: "prevent yata from making a backup before resetting",
+			},
+			cli.BoolFlag{
+				Name:  "keep-id",
+				Usage: "keep the current incrementing ID rather than starting from 1 again",
+			},
+		},
+		Action: cmd.Reset,
+	}
 }
