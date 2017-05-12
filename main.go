@@ -14,11 +14,13 @@ const (
 	// Version specifies the current release
 	Version = "1.0.0"
 
-	descAdd    = "Create a new task"
-	descConfig = "Manage configuration options"
-	descList   = "Lists the tasks"
-	descReset  = "Erases all existing tasks and starts fresh"
-	descYata   = "A command line task manager"
+	descAdd      = "Create a new task"
+	descComplete = "Marks a task as done"
+	descConfig   = "Manage configuration options"
+	descList     = "Lists the tasks"
+	descReset    = "Erases all existing tasks and starts fresh"
+	descShow     = "Displays a task based on its ID"
+	descYata     = "A command line task manager"
 )
 
 func main() {
@@ -39,8 +41,10 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		add(),
+		complete(),
 		list(),
 		reset(),
+		show(),
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
@@ -69,6 +73,17 @@ func add() cli.Command {
 			},
 		},
 		Action: cmd.Add,
+	}
+	sort.Sort(cli.FlagsByName(cmd.Flags))
+	return cmd
+}
+
+func complete() cli.Command {
+	cmd := cli.Command{
+		Name:        "complete",
+		Aliases:     []string{"finish"},
+		Description: descComplete,
+		Action:      cmd.Complete,
 	}
 	sort.Sort(cli.FlagsByName(cmd.Flags))
 	return cmd
@@ -116,5 +131,15 @@ func reset() cli.Command {
 		Action: cmd.Reset,
 	}
 	sort.Sort(cli.FlagsByName(cmd.Flags))
+	return cmd
+}
+
+func show() cli.Command {
+	cmd := cli.Command{
+		Name:        "show",
+		Aliases:     []string{"get"},
+		Description: descShow,
+		Action:      cmd.Show,
+	}
 	return cmd
 }

@@ -189,6 +189,8 @@ func checkFatal(err error) {
 	}
 }
 
+// getHomeDirectory will get the directory pointed to via the $HOME or %USERPROFILE%
+// environment variable, depending on the OS
 func getHomeDirectory() string {
 	env := "HOME"
 	if runtime.GOOS == "windows" {
