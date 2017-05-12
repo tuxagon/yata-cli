@@ -67,18 +67,35 @@ func (m *FileManager) ReadFile() []byte {
 	return dat
 }
 
+// GetAllTasks get any task found in the yata file
+func (m *FileManager) GetAllTasks() (tasks []Task) {
+	dat := m.ReadFile()
+	err := json.Unmarshal(dat, &tasks)
+	checkFatal(err)
+	return
+}
+
 // GetAllOpenTasks gets any open task found in the yata file
 func (m *FileManager) GetAllOpenTasks() (tasks []Task) {
-	var rawTasks []Task
-	dat := m.ReadFile()
-	err := json.Unmarshal(dat, &rawTasks)
-	checkFatal(err)
+	rawTasks := m.GetAllTasks()
+	tasks = make([]Task, 0)
 	for _, t := range rawTasks {
 		if !t.Completed {
 			tasks = append(tasks, t)
 		}
 	}
 	return tasks
+}
+
+// GetTaskByID returns a task by the specified ID
+func (m *FileManager) GetTaskByID(id uint32) *Task {
+	tasks := m.GetAllTasks()
+	for _, t := range tasks {
+		if t.ID == id {
+			return &t
+		}
+	}
+	return nil
 }
 
 // SaveNewTask will save the given task to the Yata file

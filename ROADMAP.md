@@ -9,7 +9,7 @@
 - `[x]` Add new task with only required fields {description}
 - `[x]` Handle "autoincrement" for files using `.yataconfig` file
 - `[ ]` Allow for task IDs to be transformed before save {prefix,suffix}
-- `[ ]` Allow for task IDs to be UUIDs
+- `[ ]` Allow for task IDs to be UUIDs?
 - `[ ]` Show a specific task based on ID
 - `[ ]` Replace an existing task with a new one
 - `[ ]` Import tasks from json
@@ -27,5 +27,6 @@
 - `[ ]` Config file `.yataconfig`
 - `[x]` Create a nuclear option to just restart
 - `[x]` Create a separate backup file if one already exists
+- `[ ]` Create a tutorial type command, like `yata tutor`
 
 This is not listed in any particular order and some of these are just thoughts and may change or just not get implemented. Roadmap = Braindump right now.

@@ -20,18 +20,22 @@ const (
 	descList     = "Lists the tasks"
 	descReset    = "Erases all existing tasks and starts fresh"
 	descShow     = "Displays a task based on its ID"
-	descYata     = "A command line task manager"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "yata"
-	app.Usage = descYata
+	app.Usage = "A command line task manager"
 	app.Version = Version
 	app.Before = func(ctx *cli.Context) error {
 		debug.Verbose = ctx.GlobalBool("verbose")
-		debug.Println("verbose logging enabled")
+		debug.Println("info :: verbose logging enabled")
 		return nil
+	}
+	app.Authors = []cli.Author{
+		cli.Author{
+			Name: "Kenneth Bogner",
+		},
 	}
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
