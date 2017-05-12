@@ -29,7 +29,6 @@ func main() {
 	app.Before = func(ctx *cli.Context) error {
 		debug.Verbose = ctx.GlobalBool("verbose")
 		debug.Println("verbose logging enabled")
-
 		return nil
 	}
 	app.Flags = []cli.Flag{
@@ -39,37 +38,8 @@ func main() {
 		},
 	}
 	app.Commands = []cli.Command{
-		cli.Command{
-			Name:  "list",
-			Usage: descList,
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "sort",
-					Usage: "sort the results by the specified field",
-				},
-			},
-			Action: cmd.List,
-		},
-		cli.Command{
-			Name:    "add",
-			Aliases: []string{"new", "create"},
-			Usage:   descAdd,
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "description,desc,d",
-					Usage: "specify the task description; tags can be included in description using the '#' prefix in the description text",
-				},
-				cli.StringFlag{
-					Name:  "tags,t",
-					Usage: "specify tags outside of the description; list is comma-delimited",
-				},
-				cli.IntFlag{
-					Name:  "priority,p",
-					Usage: "specify a priority for the task (1: Low, 2: Normal, 3: High)",
-				},
-			},
-			Action: cmd.Add,
-		},
+		add(),
+		list(),
 		reset(),
 	}
 
@@ -77,6 +47,31 @@ func main() {
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	app.Run(os.Args)
+}
+
+func add() cli.Command {
+	cmd := cli.Command{
+		Name:    "add",
+		Aliases: []string{"new", "create"},
+		Usage:   descAdd,
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "description,desc,d",
+				Usage: "specify the task description; tags can be included in description using the '#' prefix in the description text",
+			},
+			cli.StringFlag{
+				Name:  "tags,t",
+				Usage: "specify tags outside of the description; list is comma-delimited",
+			},
+			cli.IntFlag{
+				Name:  "priority,p",
+				Usage: "specify a priority for the task (1: Low, 2: Normal, 3: High)",
+			},
+		},
+		Action: cmd.Add,
+	}
+	sort.Sort(cli.FlagsByName(cmd.Flags))
+	return cmd
 }
 
 func config() cli.Command {
@@ -87,8 +82,24 @@ func config() cli.Command {
 	}
 }
 
+func list() cli.Command {
+	cmd := cli.Command{
+		Name:  "list",
+		Usage: descList,
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "sort",
+				Usage: "sort the results by the specified field",
+			},
+		},
+		Action: cmd.List,
+	}
+	sort.Sort(cli.FlagsByName(cmd.Flags))
+	return cmd
+}
+
 func reset() cli.Command {
-	return cli.Command{
+	cmd := cli.Command{
 		Name:        "reset",
 		Description: descReset,
 		Aliases:     []string{"nuke"},
@@ -104,4 +115,6 @@ func reset() cli.Command {
 		},
 		Action: cmd.Reset,
 	}
+	sort.Sort(cli.FlagsByName(cmd.Flags))
+	return cmd
 }

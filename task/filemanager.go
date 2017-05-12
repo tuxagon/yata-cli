@@ -2,7 +2,7 @@ package task
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"encoding/binary"
+	"runtime"
 )
 
 const (
@@ -30,10 +31,7 @@ type FileManager struct {
 
 // NewFileManager creates a new file manager for yata tasks
 func NewFileManager() *FileManager {
-	home, ok := os.LookupEnv("HOME")
-	if !ok {
-		panic(errors.New("Could not find 'HOME' environment variable"))
-	}
+	home := getHomeDirectory()
 	m := &FileManager{
 		FileName: DefaultFilename,
 		RootPath: path.Join(home, ".yata"),
@@ -189,4 +187,16 @@ func checkFatal(err error) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+}
+
+func getHomeDirectory() string {
+	env := "HOME"
+	if runtime.GOOS == "windows" {
+		env = "USERPROFILE"
+	}
+	home, ok := os.LookupEnv(env)
+	if !ok {
+		panic(fmt.Errorf("Could not find '%s' environment variable", env))
+	}
+	return home
 }
