@@ -4,8 +4,10 @@ package task
 // tasks
 type Manager interface {
 	Initialize()
+	GetAllTasks() []Task
 	GetAllOpenTasks() []Task
-	SaveNewTask(t Task)
+	GetTaskByID() *Task
+	SaveTask(t Task)
 }
 
 // ByPriority implements sort.Interface for []Task based on the Priority field

@@ -43,47 +43,14 @@ func NewFileManager() *FileManager {
 // Initialize will create the .yata directory and all necessary files
 // if it does not already exist. The default directory is '$HOME/.yata'
 func (m *FileManager) Initialize() {
-	m.CreateRootPath()
-	m.CreateTasksFile()
-	m.CreateIDFile()
-}
-
-// CreateRootPath will create the root directory for tasks if it does
-// not already exist
-func (m *FileManager) CreateRootPath() {
-	_, err := os.Stat(m.RootPath)
-	if err != nil {
-		os.Mkdir(m.RootPath, FilePermission)
-	}
-}
-
-// CreateTasksFile will create a new tasks file in the root for Yata tasks
-// directory with the specified name
-func (m *FileManager) CreateTasksFile() {
-	fullPath := m.GetFullPath()
-	if _, err := os.Stat(fullPath); err != nil {
-		ioutil.WriteFile(fullPath, []byte("[]"), FilePermission)
-	}
-}
-
-// CreateIDFile will create the yata ID file if it does not exist
-func (m *FileManager) CreateIDFile() {
-	fullPath := m.GetFullIDPath()
-	if _, err := os.Stat(fullPath); err != nil {
-		m.SetID(0)
-	}
-}
-
-// ReadFile reads the contents of a yata task file
-func (m *FileManager) ReadFile() []byte {
-	dat, err := ioutil.ReadFile(m.GetFullPath())
-	exitIfErr(err)
-	return dat
+	m.createRootPath()
+	m.createTasksFile()
+	m.createIDFile()
 }
 
 // GetAllTasks get any task found in the yata file
 func (m *FileManager) GetAllTasks() (tasks []Task) {
-	dat := m.ReadFile()
+	dat := m.readFile()
 	err := json.Unmarshal(dat, &tasks)
 	exitIfErr(err)
 	return
@@ -118,9 +85,7 @@ func (m *FileManager) SaveTask(t Task) {
 	found := false
 	for i, v := range tasks {
 		if v.ID == t.ID {
-			if t.ID == 0 {
-				t.ID = m.GetAndIncreaseID()
-			}
+			m.changeIDIfZero(&t)
 			tasks[i] = t
 			found = true
 			break
@@ -128,7 +93,7 @@ func (m *FileManager) SaveTask(t Task) {
 	}
 
 	if !found {
-		t.ID = m.GetAndIncreaseID()
+		m.changeIDIfZero(&t)
 		tasks = append(tasks, t)
 	}
 
@@ -154,7 +119,7 @@ func (m *FileManager) Reset() {
 	if _, err := os.Stat(fullPath); err == nil {
 		os.Remove(fullPath)
 	}
-	m.CreateTasksFile()
+	m.createTasksFile()
 	m.SetID(0)
 }
 
@@ -221,6 +186,45 @@ func (m *FileManager) SetID(id uint32) {
 	bs := make([]byte, 4)
 	binary.BigEndian.PutUint32(bs, id)
 	ioutil.WriteFile(m.GetFullIDPath(), bs, FilePermission)
+}
+
+// createRootPath will create the root directory for tasks if it does
+// not already exist
+func (m FileManager) createRootPath() {
+	_, err := os.Stat(m.RootPath)
+	if err != nil {
+		os.Mkdir(m.RootPath, FilePermission)
+	}
+}
+
+// createTasksFile will create a new tasks file in the root of the
+// tasks directory
+func (m FileManager) createTasksFile() {
+	fullPath := m.GetFullPath()
+	if _, err := os.Stat(fullPath); err != nil {
+		ioutil.WriteFile(fullPath, []byte("[]"), FilePermission)
+	}
+}
+
+// createIDFile will create the .yataid file if it does not exist
+func (m FileManager) createIDFile() {
+	fullPath := m.GetFullIDPath()
+	if _, err := os.Stat(fullPath); err != nil {
+		m.SetID(0)
+	}
+}
+
+// readFile reads the contents of a yata task file
+func (m FileManager) readFile() []byte {
+	dat, err := ioutil.ReadFile(m.GetFullPath())
+	exitIfErr(err)
+	return dat
+}
+
+func (m FileManager) changeIDIfZero(t *Task) {
+	if t.ID == 0 {
+		t.ID = m.GetAndIncreaseID()
+	}
 }
 
 // eitherString will return the first parameter if it is not nil; otherwise,

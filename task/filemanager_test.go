@@ -11,7 +11,7 @@ import (
 func TestCreateRootPathWillCreateRootDirectory(t *testing.T) {
 	m := newFileManager()
 
-	m.CreateRootPath()
+	m.createRootPath()
 
 	if _, err := os.Stat(m.RootPath); err != nil {
 		t.Error("expected directory '.yata' to exist got", err.Error())
@@ -22,10 +22,10 @@ func TestCreateRootPathWillCreateRootDirectory(t *testing.T) {
 
 func TestCreateTasksFileWillCreateTasksFile(t *testing.T) {
 	m := newFileManager()
-	m.CreateRootPath()
+	m.createRootPath()
 	p := path.Join(m.RootPath, m.FileName)
 
-	m.CreateTasksFile()
+	m.createTasksFile()
 
 	if _, err := os.Stat(p); err != nil {
 		t.Error("expected file '.yata/task' to exist got", err.Error())
@@ -36,10 +36,10 @@ func TestCreateTasksFileWillCreateTasksFile(t *testing.T) {
 
 func TestCreateTasksFileWillWriteAnEmptySliceToFile(t *testing.T) {
 	m := newFileManager()
-	m.CreateRootPath()
+	m.createRootPath()
 	p := path.Join(m.RootPath, m.FileName)
 
-	m.CreateTasksFile()
+	m.createTasksFile()
 
 	if dat, _ := ioutil.ReadFile(p); string(dat) != "[]" {
 		t.Error("expect file '.yata/task' to have contents '[]' got", string(dat))
@@ -51,10 +51,10 @@ func TestCreateTasksFileWillWriteAnEmptySliceToFile(t *testing.T) {
 func TestCreateTasksFileWillIgnoreTaskFileIfItExists(t *testing.T) {
 	m := newFileManager()
 	p := path.Join(m.RootPath, m.FileName)
-	m.CreateRootPath()
+	m.createRootPath()
 	ioutil.WriteFile(p, []byte("test"), FilePermission)
 
-	m.CreateTasksFile()
+	m.createTasksFile()
 
 	if dat, _ := ioutil.ReadFile(p); string(dat) != "test" {
 		t.Error("expect file '.yata/task' to have contents 'test' got", string(dat))
@@ -65,10 +65,10 @@ func TestCreateTasksFileWillIgnoreTaskFileIfItExists(t *testing.T) {
 
 func TestCreateIDFileWillCreateIDFile(t *testing.T) {
 	m := newFileManager()
-	m.CreateRootPath()
+	m.createRootPath()
 	p := path.Join(m.RootPath, IDFilename)
 
-	m.CreateIDFile()
+	m.createIDFile()
 
 	if _, err := ioutil.ReadFile(p); err != nil {
 		t.Errorf("expected file '.yata/%s' to be read got %v", IDFilename, err.Error())
@@ -79,10 +79,10 @@ func TestCreateIDFileWillCreateIDFile(t *testing.T) {
 
 func TestCreateIDFileWillContainBigEndianZero(t *testing.T) {
 	m := newFileManager()
-	m.CreateRootPath()
+	m.createRootPath()
 	p := path.Join(m.RootPath, IDFilename)
 
-	m.CreateIDFile()
+	m.createIDFile()
 
 	if dat, _ := ioutil.ReadFile(p); binary.BigEndian.Uint32(dat) != 0 {
 		t.Error("expected file to contain 0 got", binary.BigEndian.Uint32(dat))
@@ -93,12 +93,12 @@ func TestCreateIDFileWillContainBigEndianZero(t *testing.T) {
 
 func TestCreateIDFileWillIgnoreTaskFileIfItExists(t *testing.T) {
 	m := newFileManager()
-	m.CreateRootPath()
-	m.CreateIDFile()
+	m.createRootPath()
+	m.createIDFile()
 	p := path.Join(m.RootPath, IDFilename)
 	m.SetID(1)
 
-	m.CreateIDFile()
+	m.createIDFile()
 
 	if dat, _ := ioutil.ReadFile(p); binary.BigEndian.Uint32(dat) != 1 {
 		t.Error("expected file to contain 1 got", binary.BigEndian.Uint32(dat))
@@ -135,7 +135,7 @@ func TestReadFileWillReturnTheContentsOfTheFile(t *testing.T) {
 	m := newFileManager()
 	m.Initialize()
 
-	dat := m.ReadFile()
+	dat := m.readFile()
 
 	if string(dat) != "[]" {
 		t.Error("expect file '.yata/task' to have contents '[]' got", string(dat))

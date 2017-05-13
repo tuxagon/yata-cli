@@ -4,6 +4,7 @@ import (
 	"os"
 	"sort"
 	"yata-cli/cmd"
+	"yata-cli/yata"
 
 	//"github.com/tuxagon/yata-cli/cmd"
 	"github.com/tuxagon/yata-cli/debug"
@@ -24,6 +25,8 @@ const (
 )
 
 func main() {
+	yata.Println("this is a test")
+
 	app := cli.NewApp()
 	app.Name = "yata"
 	app.Usage = "A command line task manager"
