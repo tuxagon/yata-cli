@@ -11,8 +11,8 @@ import (
 const (
 	// Low represents a low priority
 	Low = 1 << iota
-	// Med represents a medium priority
-	Med
+	// Normal represents a normal, medium priority
+	Normal
 	// High represents a high priority
 	High
 )
@@ -25,9 +25,6 @@ type Task struct {
 	Priority    int      `json:"priority"`
 	Tags        []string `json:"tags"`
 }
-
-// TaskList represents a list of yata tasks
-type TaskList []Task
 
 // Predicate is used to test some condition about a task
 type Predicate func(Task) bool
@@ -51,8 +48,8 @@ func (t *Task) MarshalTask() []byte {
 	return json
 }
 
-// ExtractTagsFromDescription will extract any tags from the description and
-func (t *Task) ExtractTagsFromDescription() {
+// ExtractTags will extract any tags from the description and
+func (t *Task) ExtractTags() {
 	re := regexp.MustCompile("#[A-z0-9_-]+")
 	if tags := re.FindAllString(t.Description, -1); tags != nil {
 		for i, v := range tags {
@@ -64,13 +61,17 @@ func (t *Task) ExtractTagsFromDescription() {
 
 // String returns a string representation of a Yata task
 func (t *Task) String() string {
-	return fmt.Sprintf("%s", t.Description)
+	dat, err := json.MarshalIndent(t, "", "\t")
+	if err != nil {
+		return fmt.Sprintf("%+v", *t)
+	}
+	return string(dat)
 }
 
 // Filter returns a new list of tasks that satisfy the predicate
-func (ts TaskList) Filter(pred Predicate) TaskList {
+func Filter(tasks []Task, pred Predicate) []Task {
 	filteredTasks := make([]Task, 0)
-	for _, t := range ts {
+	for _, t := range tasks {
 		if pred(t) {
 			filteredTasks = append(filteredTasks, t)
 		}

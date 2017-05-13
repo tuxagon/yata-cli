@@ -27,7 +27,7 @@ func Add(ctx *cli.Context) error {
 	}
 
 	newTask := task.NewTask(desc, tags, priority)
-	newTask.ExtractTagsFromDescription()
+	newTask.ExtractTags()
 
 	m.SaveTask(*newTask)
 
