@@ -15,12 +15,12 @@ import (
 )
 
 const (
-	// DefaultProject represents the name of the default project when on is not specified
-	DefaultProject = "__none__"
 	// DefaultFilename represents the name of the default Yata tasks file
 	DefaultFilename = "tasks"
 	// IDFilename represents the name of the file containing the next task id to use
 	IDFilename = ".yataid"
+	// FilePermission represents the file permissions each file should get
+	FilePermission = 0777
 )
 
 // FileManager handles all the task management through files
@@ -43,12 +43,18 @@ func NewFileManager() *FileManager {
 // Initialize will create the .yata directory and all necessary files
 // if it does not already exist. The default directory is '$HOME/.yata'
 func (m *FileManager) Initialize() {
-	_, err := os.Stat(m.RootPath)
-	if err != nil {
-		os.Mkdir(m.RootPath, 0777)
-	}
+	m.CreateRootPath()
 	m.CreateTasksFile()
 	m.CreateIDFile()
+}
+
+// CreateRootPath will create the root directory for tasks if it does
+// not already exist
+func (m *FileManager) CreateRootPath() {
+	_, err := os.Stat(m.RootPath)
+	if err != nil {
+		os.Mkdir(m.RootPath, FilePermission)
+	}
 }
 
 // CreateTasksFile will create a new tasks file in the root for Yata tasks
@@ -56,14 +62,22 @@ func (m *FileManager) Initialize() {
 func (m *FileManager) CreateTasksFile() {
 	fullPath := m.GetFullPath()
 	if _, err := os.Stat(fullPath); err != nil {
-		ioutil.WriteFile(fullPath, []byte("[]"), 0777)
+		ioutil.WriteFile(fullPath, []byte("[]"), FilePermission)
+	}
+}
+
+// CreateIDFile will create the yata ID file if it does not exist
+func (m *FileManager) CreateIDFile() {
+	fullPath := m.GetFullIDPath()
+	if _, err := os.Stat(fullPath); err != nil {
+		m.SetID(0)
 	}
 }
 
 // ReadFile reads the contents of a yata task file
 func (m *FileManager) ReadFile() []byte {
 	dat, err := ioutil.ReadFile(m.GetFullPath())
-	checkFatal(err)
+	exitIfErr(err)
 	return dat
 }
 
@@ -71,7 +85,7 @@ func (m *FileManager) ReadFile() []byte {
 func (m *FileManager) GetAllTasks() (tasks []Task) {
 	dat := m.ReadFile()
 	err := json.Unmarshal(dat, &tasks)
-	checkFatal(err)
+	exitIfErr(err)
 	return
 }
 
@@ -119,8 +133,8 @@ func (m *FileManager) SaveTask(t Task) {
 	}
 
 	dat, err := json.Marshal(tasks)
-	checkFatal(err)
-	ioutil.WriteFile(m.GetFullPath(), dat, 0777)
+	exitIfErr(err)
+	ioutil.WriteFile(m.GetFullPath(), dat, FilePermission)
 }
 
 // BackUp will copy the tasks file into a separate file
@@ -130,8 +144,8 @@ func (m *FileManager) BackUp() {
 		return
 	}
 	dat, err := ioutil.ReadFile(fullPath)
-	checkFatal(err)
-	ioutil.WriteFile(m.GetBackUpFile(), dat, 0777)
+	exitIfErr(err)
+	ioutil.WriteFile(m.GetBackUpFile(), dat, FilePermission)
 }
 
 // Reset will erase the existing tasks file
@@ -142,6 +156,18 @@ func (m *FileManager) Reset() {
 	}
 	m.CreateTasksFile()
 	m.SetID(0)
+}
+
+// Prune removes any completed tasks from the tasks file
+func (m *FileManager) Prune() {
+	tasks := m.GetAllTasks()
+	fullPath := m.GetFullPath()
+	ioutil.WriteFile(fullPath, []byte("[]"), FilePermission)
+	for _, t := range tasks {
+		if !t.Completed {
+			m.SaveTask(t)
+		}
+	}
 }
 
 // GetFilename gets the name of the tasks file from config
@@ -179,7 +205,7 @@ func (m *FileManager) GetBackUpFile() string {
 func (m *FileManager) GetCurrentID() uint32 {
 	fullPath := m.GetFullIDPath()
 	dat, err := ioutil.ReadFile(fullPath)
-	checkFatal(err)
+	exitIfErr(err)
 	return binary.BigEndian.Uint32(dat)
 }
 
@@ -190,19 +216,11 @@ func (m *FileManager) GetAndIncreaseID() uint32 {
 	return newID
 }
 
-// CreateIDFile will create the yata ID file if it does not exist
-func (m *FileManager) CreateIDFile() {
-	fullPath := m.GetFullIDPath()
-	if _, err := os.Stat(fullPath); err != nil {
-		m.SetID(0)
-	}
-}
-
 // SetID writes the id specified into the ID file
 func (m *FileManager) SetID(id uint32) {
 	bs := make([]byte, 4)
 	binary.BigEndian.PutUint32(bs, id)
-	ioutil.WriteFile(m.GetFullIDPath(), bs, 0777)
+	ioutil.WriteFile(m.GetFullIDPath(), bs, FilePermission)
 }
 
 // eitherString will return the first parameter if it is not nil; otherwise,
@@ -214,8 +232,8 @@ func eitherString(s1, s2 string) string {
 	return s1
 }
 
-// checkFatal displays a fatal log if
-func checkFatal(err error) {
+// exitIfErr displays a fatal log if
+func exitIfErr(err error) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}

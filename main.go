@@ -18,6 +18,7 @@ const (
 	descComplete = "Marks a task as done"
 	descConfig   = "Manage configuration options"
 	descList     = "Lists the tasks"
+	descPrune    = "Removes all completed tasks"
 	descReset    = "Erases all existing tasks and starts fresh"
 	descShow     = "Displays a task based on its ID"
 )
@@ -47,6 +48,7 @@ func main() {
 		add(),
 		complete(),
 		list(),
+		prune(),
 		reset(),
 		show(),
 	}
@@ -114,6 +116,15 @@ func list() cli.Command {
 		Action: cmd.List,
 	}
 	sort.Sort(cli.FlagsByName(cmd.Flags))
+	return cmd
+}
+
+func prune() cli.Command {
+	cmd := cli.Command{
+		Name:   "prune",
+		Usage:  descPrune,
+		Action: cmd.Prune,
+	}
 	return cmd
 }
 

@@ -10,7 +10,7 @@
 - `[x]` Handle "autoincrement" for files using `.yataconfig` file
 - `[ ]` Allow for task IDs to be transformed before save {prefix,suffix}
 - `[ ]` Allow for task IDs to be UUIDs?
-- `[ ]` Show a specific task based on ID
+- `[x]` Show a specific task based on ID
 - `[ ]` Replace an existing task with a new one
 - `[ ]` Import tasks from json
 - `[ ]` Tasks are update-able through additions, changes, or deletions
@@ -28,5 +28,7 @@
 - `[x]` Create a nuclear option to just restart
 - `[x]` Create a separate backup file if one already exists
 - `[ ]` Create a tutorial type command, like `yata tutor`
+- `[ ]` Something regarding subtasks should be figured out
+- `[ ]` Add super-friendly messages and possibly allow for customizing messages based on names and configuration (like adding pirate-y messages)
 
 This is not listed in any particular order and some of these are just thoughts and may change or just not get implemented. Roadmap = Braindump right now.
