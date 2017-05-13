@@ -98,11 +98,26 @@ func (m *FileManager) GetTaskByID(id uint32) *Task {
 	return nil
 }
 
-// SaveNewTask will save the given task to the Yata file
-func (m *FileManager) SaveNewTask(t Task) {
-	t.ID = m.GetAndIncreaseID()
-	tasks := m.GetAllOpenTasks()
-	tasks = append(tasks, t)
+// SaveTask will save the given task to the Yata file
+func (m *FileManager) SaveTask(t Task) {
+	tasks := m.GetAllTasks()
+	found := false
+	for i, v := range tasks {
+		if v.ID == t.ID {
+			if t.ID == 0 {
+				t.ID = m.GetAndIncreaseID()
+			}
+			tasks[i] = t
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		t.ID = m.GetAndIncreaseID()
+		tasks = append(tasks, t)
+	}
+
 	dat, err := json.Marshal(tasks)
 	checkFatal(err)
 	ioutil.WriteFile(m.GetFullPath(), dat, 0777)

@@ -28,7 +28,8 @@ func Complete(ctx *cli.Context) error {
 	m := task.NewFileManager()
 	task := m.GetTaskByID(uint32(id))
 	if task != nil {
-		fmt.Println(task.String())
+		task.Completed = true
+		m.SaveTask(*task)
 	} else {
 		fmt.Printf("task %d not found\n", id)
 	}

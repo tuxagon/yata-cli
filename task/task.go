@@ -26,6 +26,12 @@ type Task struct {
 	Tags        []string `json:"tags"`
 }
 
+// TaskList represents a list of yata tasks
+type TaskList []Task
+
+// Predicate is used to test some condition about a task
+type Predicate func(Task) bool
+
 // NewTask creates a new Yata task
 func NewTask(description string, tags []string, priority int) *Task {
 	return &Task{
@@ -59,4 +65,15 @@ func (t *Task) ExtractTagsFromDescription() {
 // String returns a string representation of a Yata task
 func (t *Task) String() string {
 	return fmt.Sprintf("%s", t.Description)
+}
+
+// Filter returns a new list of tasks that satisfy the predicate
+func (ts TaskList) Filter(pred Predicate) TaskList {
+	filteredTasks := make([]Task, 0)
+	for _, t := range ts {
+		if pred(t) {
+			filteredTasks = append(filteredTasks, t)
+		}
+	}
+	return filteredTasks
 }
