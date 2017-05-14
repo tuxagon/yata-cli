@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"sort"
-	"yata-cli/debug"
 	"yata-cli/task"
 
 	//"github.com/tuxagon/yata-cli/task"
@@ -12,13 +11,19 @@ import (
 
 // List returns the list of tasks/todos that have been recorded
 func List(ctx *cli.Context) error {
-	debug.Verbose = ctx.GlobalBool("verbose")
-	debug.Printf("args :: %+v\n", ctx.Args())
+	var tasks []task.Task
+
+	sort := ctx.String("sort")
+	showAll := ctx.Bool("all")
 
 	m := task.NewFileManager()
-	tasks := m.GetAllOpenTasks()
+	if showAll {
+		tasks = m.GetAllTasks()
+	} else {
+		tasks = m.GetAllOpenTasks()
+	}
 
-	tasks = sortTasks(ctx.String("sort"), tasks)
+	tasks = sortTasks(sort, tasks)
 
 	for _, v := range tasks {
 		fmt.Println(v.String())

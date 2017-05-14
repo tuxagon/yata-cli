@@ -6,27 +6,38 @@ import (
 	//"github.com/tuxagon/yata-cli/task"
 	"strings"
 
+	"yata-cli/yata"
+
 	"github.com/urfave/cli"
+)
+
+const (
+	addDescriptionPrompt = "Whoops, that task is missing a description. What description should this task have?"
 )
 
 // Add creates a new task
 func Add(ctx *cli.Context) error {
-	m := task.NewFileManager()
-
-	desc := ctx.String("description")
-	if desc == "" {
-		return cli.NewExitError("cannot add task without a description", 1)
-	}
+	args := ctx.Args()
 
 	tags := make([]string, 0)
-	tagsFlag := ctx.String("tags")
+	flagTags := ctx.String("tags")
 	priority := ctx.Int("priority")
+	description := ctx.String("description")
 
-	if tagsFlag != "" {
-		tags = strings.Split(tagsFlag, ",")
+	if description == "" && len(args) == 0 {
+		yata.PrintfColor("yellow+h", "%s\nDescription: ", addDescriptionPrompt)
+		description = yata.Readln()
+	} else if description == "" && len(args) > 0 {
+		description = strings.Join(args, " ")
 	}
 
-	newTask := task.NewTask(desc, tags, priority)
+	m := task.NewFileManager()
+
+	if flagTags != "" {
+		tags = strings.Split(flagTags, ",")
+	}
+
+	newTask := task.NewTask(description, tags, priority)
 	newTask.ExtractTags()
 
 	m.SaveTask(*newTask)

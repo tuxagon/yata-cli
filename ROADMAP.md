@@ -1,34 +1,65 @@
 # Yata Roadmap
 
+## General
+- `[ ]` Add created_at field to task
+- `[ ]` Replace an existing task with a new one
+- `[ ]` Tasks are update-able through additions, changes, or deletions
+- `[x]` Apply tags to any task `#sometag`
+- `[ ]` Allow filtering based on tag
+- `[ ]` List all tags
+- `[ ]` Change task from completed to incomplete?
+- `[ ]` Allow aliases to be set up to simplify commands
+- `[x]` Command line colors
+- `[ ]` File-based and SQLite storage options
+- `[x]` Create a separate backup file if one already exists
+- `[ ]` Something regarding subtasks should be figured out
+- `[ ]` Add super-friendly messages and possibly allow for customizing messages based on names and configuration (like adding pirate-y messages)
+- `[ ]` Allow for messages to be suppressed unless there are errors
+
+## Add command
+- `[x]` Add new task with only required fields {description}
+
+## Archive command
+- `[ ]` Allow archiving of tasks
+- `[ ]` Should archiving based on a criteria be permitted?
+
+# Complete command 
+- `[x]` Mark a task as completed
+
+## Config
+- `[x]` Handle "autoincrement" for files using `.yataid` file
+- `[ ]` Allow for task IDs to be transformed before save {prefix,suffix}
+- `[ ]` ~~Allow for task IDs to be UUIDs?~~
+- `[ ]` Config file `.yataconfig`
+
+# Delete command
+- `[ ]` Delete tasks
+
+# Import/Export commands
+- `[ ]` Import tasks from json
+- `[ ]` Export tasks to json
+
+## List command
 - `[ ]` List all tasks unfiltered, unsorted
 - `[ ]` List all tasks sorted on specified field {created_at,description,priority}
 - `[ ]` List all tasks that meet criteria {filter,completed,tag}
 - `[ ]` Change how the list renders {simple,verbose,printf}
-- `[ ]` Prune completed tasks from database/file
-- `[ ]` Allow archiving of tasks based on criteria
-- `[x]` Add new task with only required fields {description}
-- `[x]` Handle "autoincrement" for files using `.yataconfig` file
-- `[ ]` Allow for task IDs to be transformed before save {prefix,suffix}
-- `[ ]` Allow for task IDs to be UUIDs?
-- `[x]` Show a specific task based on ID
-- `[ ]` Replace an existing task with a new one
-- `[ ]` Import tasks from json
-- `[ ]` Tasks are update-able through additions, changes, or deletions
-- `[ ]` Delete tasks
-- `[x]` Apply tags to any task `#sometag`
-- `[ ]` Allow filtering based on tag
-- `[ ]` List all tags
-- `[ ]` Mark a task as completed/uncompleted
-- `[ ]` Allow aliases to be set up to simplify commands
+
+## Prune command
+- `[x]` Prune completed tasks from database/file
+
+## Push/Fetch command
 - `[ ]` Push the tasks data to a server {Google Drive,Dropbox}
 - `[ ]` Fetch tasks data from a server {Google Drive,Dropbox}
-- `[ ]` Command line colors
-- `[ ]` File-based and SQLite storage options
-- `[ ]` Config file `.yataconfig`
+
+## Reset command
 - `[x]` Create a nuclear option to just restart
-- `[x]` Create a separate backup file if one already exists
+
+## Show command
+- `[x]` Show a specific task based on ID
+
+## Tutor command
 - `[ ]` Create a tutorial type command, like `yata tutor`
-- `[ ]` Something regarding subtasks should be figured out
-- `[ ]` Add super-friendly messages and possibly allow for customizing messages based on names and configuration (like adding pirate-y messages)
+
 
 This is not listed in any particular order and some of these are just thoughts and may change or just not get implemented. Roadmap = Braindump right now.

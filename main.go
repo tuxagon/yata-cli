@@ -4,7 +4,6 @@ import (
 	"os"
 	"sort"
 	"yata-cli/cmd"
-	"yata-cli/yata"
 
 	//"github.com/tuxagon/yata-cli/cmd"
 	"github.com/tuxagon/yata-cli/debug"
@@ -25,8 +24,6 @@ const (
 )
 
 func main() {
-	yata.Println("this is a test")
-
 	app := cli.NewApp()
 	app.Name = "yata"
 	app.Usage = "A command line task manager"
@@ -65,6 +62,7 @@ func main() {
 func add() cli.Command {
 	cmd := cli.Command{
 		Name:    "add",
+		Action:  cmd.Add,
 		Aliases: []string{"new", "create"},
 		Usage:   descAdd,
 		Flags: []cli.Flag{
@@ -81,7 +79,6 @@ func add() cli.Command {
 				Usage: "specify a priority for the task (1: Low, 2: Normal, 3: High)",
 			},
 		},
-		Action: cmd.Add,
 	}
 	sort.Sort(cli.FlagsByName(cmd.Flags))
 	return cmd
@@ -90,9 +87,15 @@ func add() cli.Command {
 func complete() cli.Command {
 	cmd := cli.Command{
 		Name:        "complete",
+		Action:      cmd.Complete,
 		Aliases:     []string{"finish"},
 		Description: descComplete,
-		Action:      cmd.Complete,
+		Flags: []cli.Flag{
+			cli.IntFlag{
+				Name:  "id",
+				Usage: "specify the ID of the task to complete",
+			},
+		},
 	}
 	sort.Sort(cli.FlagsByName(cmd.Flags))
 	return cmd
@@ -101,22 +104,26 @@ func complete() cli.Command {
 func config() cli.Command {
 	return cli.Command{
 		Name:        "config",
-		Description: descConfig,
 		Action:      cmd.Config,
+		Description: descConfig,
 	}
 }
 
 func list() cli.Command {
 	cmd := cli.Command{
-		Name:  "list",
-		Usage: descList,
+		Name:   "list",
+		Action: cmd.List,
+		Usage:  descList,
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "sort",
 				Usage: "sort the results by the specified field",
 			},
+			cli.BoolFlag{
+				Name:  "all,a",
+				Usage: "display all tasks, including completed",
+			},
 		},
-		Action: cmd.List,
 	}
 	sort.Sort(cli.FlagsByName(cmd.Flags))
 	return cmd
@@ -134,6 +141,7 @@ func prune() cli.Command {
 func reset() cli.Command {
 	cmd := cli.Command{
 		Name:        "reset",
+		Action:      cmd.Reset,
 		Description: descReset,
 		Aliases:     []string{"nuke"},
 		Flags: []cli.Flag{
@@ -146,7 +154,6 @@ func reset() cli.Command {
 				Usage: "keep the current incrementing ID rather than starting from 1 again",
 			},
 		},
-		Action: cmd.Reset,
 	}
 	sort.Sort(cli.FlagsByName(cmd.Flags))
 	return cmd
@@ -155,9 +162,15 @@ func reset() cli.Command {
 func show() cli.Command {
 	cmd := cli.Command{
 		Name:        "show",
+		Action:      cmd.Show,
 		Aliases:     []string{"get"},
 		Description: descShow,
-		Action:      cmd.Show,
+		Flags: []cli.Flag{
+			cli.IntFlag{
+				Name:  "id",
+				Usage: "specify the ID of the task to complete",
+			},
+		},
 	}
 	return cmd
 }

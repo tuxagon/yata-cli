@@ -1,28 +1,34 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"strconv"
-	"yata-cli/debug"
+
 	"yata-cli/task"
+	"yata-cli/yata"
 
 	"github.com/urfave/cli"
 )
 
+const (
+	completeIDPrompt = "Whoops, no task ID was specified. What is the ID of the task you want to complete?"
+)
+
 // Complete will mark the specified task as completed
 func Complete(ctx *cli.Context) error {
-	debug.Verbose = ctx.GlobalBool("verbose")
-	debug.Printf("args :: %+v\n", ctx.Args())
-
 	args := ctx.Args()
 
-	if len(args) == 0 {
-		return cli.NewExitError("a task id must be specified", 1)
-	}
+	id := ctx.Int("id")
 
-	id, err := strconv.Atoi(args[0])
-	if err != nil {
-		return cli.NewExitError("task id must be an integer", 1)
+	if id == 0 && len(args) == 0 {
+		yata.PrintfColor("yellow+h", "%s\nID: ", completeIDPrompt)
+		id = yata.ReadInt()
+	} else if id == 0 && len(args) > 0 {
+		var err error
+		id, err = strconv.Atoi(args[0])
+		if err != nil {
+			log.Fatal(err.Error())
+		}
 	}
 
 	m := task.NewFileManager()
@@ -31,7 +37,7 @@ func Complete(ctx *cli.Context) error {
 		task.Completed = true
 		m.SaveTask(*task)
 	} else {
-		fmt.Printf("task %d not found\n", id)
+		yata.PrintfColor("red+h", "Sorry, no task with an ID of %d was found", string(id))
 	}
 
 	return nil
