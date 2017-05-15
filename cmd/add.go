@@ -25,10 +25,15 @@ func Add(ctx *cli.Context) error {
 	description := ctx.String("description")
 
 	if description == "" && len(args) == 0 {
-		yata.PrintfColor("yellow+h", "%s\nDescription: ", addDescriptionPrompt)
+		yata.PrintlnColor("yellow+h", addDescriptionPrompt)
+		yata.Printf("Description: ")
 		description = yata.Readln()
 	} else if description == "" && len(args) > 0 {
 		description = strings.Join(args, " ")
+	}
+
+	if priority == 0 || priority > 3 {
+		priority = task.Normal
 	}
 
 	m := task.NewFileManager()

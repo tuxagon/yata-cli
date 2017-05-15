@@ -1,7 +1,7 @@
 # Yata Roadmap
 
 ## General
-- `[ ]` Add created_at field to task
+- `[x]` Add `timestamp` field to task
 - `[ ]` Replace an existing task with a new one
 - `[ ]` Tasks are update-able through additions, changes, or deletions
 - `[x]` Apply tags to any task `#sometag`

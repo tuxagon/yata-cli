@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"sort"
+
 	"yata-cli/cmd"
 
 	//"github.com/tuxagon/yata-cli/cmd"
@@ -17,6 +18,7 @@ const (
 	descAdd      = "Create a new task"
 	descComplete = "Marks a task as done"
 	descConfig   = "Manage configuration options"
+	descDelete   = "Deletes a task"
 	descList     = "Lists the tasks"
 	descPrune    = "Removes all completed tasks"
 	descReset    = "Erases all existing tasks and starts fresh"
@@ -47,6 +49,7 @@ func main() {
 	app.Commands = []cli.Command{
 		add(),
 		complete(),
+		delete(),
 		list(),
 		prune(),
 		reset(),
@@ -106,6 +109,21 @@ func config() cli.Command {
 		Name:        "config",
 		Action:      cmd.Config,
 		Description: descConfig,
+	}
+}
+
+func delete() cli.Command {
+	return cli.Command{
+		Name:        "delete",
+		Action:      cmd.Delete,
+		Aliases:     []string{"del"},
+		Description: descDelete,
+		Flags: []cli.Flag{
+			cli.IntFlag{
+				Name:  "id",
+				Usage: "specify the ID of the task to delete",
+			},
+		},
 	}
 }
 

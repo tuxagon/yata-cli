@@ -16,28 +16,43 @@ var (
 	in  io.Reader = os.Stdin
 )
 
+// Print will display a string with the configured io.Writer
+func Print(a ...interface{}) {
+	fmt.Fprint(out, a...)
+}
+
+// PrintColor will display a string styled with mgutz/ansi
+// styles with the configured io.Writer
+func PrintColor(style string, a ...interface{}) {
+	s := fmt.Sprint(a...)
+	colorizer := ansi.ColorFunc(style)
+	fmt.Fprint(out, colorizer(s))
+}
+
 // Printf will display a string with the configured io.Writer
 // using the provided format
-func Printf(format, s string) {
-	fmt.Printf(format, s)
+func Printf(format string, a ...interface{}) {
+	fmt.Fprintf(out, format, a...)
 }
 
 // PrintfColor will display a string styled with mgutz/ansi
 // styles with the configured io.Writer using the provided
 // format
-func PrintfColor(style, format, s string) {
+func PrintfColor(style, format string, a ...interface{}) {
+	s := fmt.Sprintf(format, a...)
 	colorizer := ansi.ColorFunc(style)
-	fmt.Fprintf(out, format, colorizer(s))
+	fmt.Fprint(out, colorizer(s))
 }
 
 // Println will display a string with the configured io.Writer
-func Println(s string) {
-	fmt.Fprintln(out, s)
+func Println(a ...interface{}) {
+	fmt.Fprintln(out, a...)
 }
 
 // PrintlnColor will display a string styled with mgutz/ansi
 // styles with the configured io.Writer
-func PrintlnColor(style, s string) {
+func PrintlnColor(style string, a ...interface{}) {
+	s := fmt.Sprint(a...)
 	colorizer := ansi.ColorFunc(style)
 	fmt.Fprintln(out, colorizer(s))
 }

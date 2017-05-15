@@ -6,15 +6,24 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strings"
+	"time"
 )
 
 const (
 	// Low represents a low priority
-	Low = 1 << iota
+	Low = 1
 	// Normal represents a normal, medium priority
-	Normal
+	Normal = 2
 	// High represents a high priority
-	High
+	High = 3
+)
+
+const (
+	// Simple represents a simple stringer
+	Simple = iota
+	// JSON represents a JSON stringer
+	JSON
 )
 
 // Task represents a yata task
@@ -24,6 +33,17 @@ type Task struct {
 	Completed   bool     `json:"done"`
 	Priority    int      `json:"priority"`
 	Tags        []string `json:"tags"`
+	Timestamp   int64    `json:"timestamp"`
+}
+
+// SimpleStringer abstracts a simple task display
+type SimpleStringer struct {
+	task Task
+}
+
+// JSONStringer abstracts a task displaying with JSON
+type JSONStringer struct {
+	task Task
 }
 
 // Predicate is used to test some condition about a task
@@ -36,6 +56,7 @@ func NewTask(description string, tags []string, priority int) *Task {
 		Completed:   false,
 		Priority:    priority,
 		Tags:        tags,
+		Timestamp:   time.Now().Unix(),
 	}
 }
 
@@ -77,4 +98,42 @@ func Filter(tasks []Task, pred Predicate) []Task {
 		}
 	}
 	return filteredTasks
+}
+
+// NewTaskStringer returns the desired type that will stringify a
+// task to display to the user
+func NewTaskStringer(t Task, stringerType int8) fmt.Stringer {
+	switch stringerType {
+	case JSON:
+		return JSONStringer{task: t}
+	default:
+		return SimpleStringer{task: t}
+	}
+}
+
+func (s SimpleStringer) String() string {
+	format := "{id} {description} {tags}"
+	return replacePlaceholders(format, s.task)
+}
+
+func (s JSONStringer) String() string {
+	dat, err := json.MarshalIndent(&s.task, "", "\t")
+	if err != nil {
+		return fmt.Sprintf("%+v", s.task)
+	}
+	return string(dat)
+}
+
+func replacePlaceholders(format string, t Task) string {
+	if len(t.Tags) == 0 {
+		format = strings.Replace(format, "{tags}", "", -1)
+		format = strings.Trim(format, " ")
+	}
+	r := strings.NewReplacer(
+		"{id}", fmt.Sprintf("%d", t.ID),
+		"{description}", t.Description,
+		"{priority}", fmt.Sprintf("%d", t.Priority),
+		"{tags}", fmt.Sprintf("%+v", t.Tags),
+		"{timestamp}", fmt.Sprintf("%d", t.Timestamp))
+	return r.Replace(format)
 }

@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"time"
 
 	"strings"
 
@@ -83,6 +84,7 @@ func (m *FileManager) GetTaskByID(id uint32) *Task {
 func (m *FileManager) SaveTask(t Task) {
 	tasks := m.GetAllTasks()
 	found := false
+	t.Timestamp = time.Now().Unix()
 	for i, v := range tasks {
 		if v.ID == t.ID {
 			m.changeIDIfZero(&t)
