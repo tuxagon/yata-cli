@@ -5,9 +5,10 @@ import (
 	"sort"
 
 	"yata-cli/cmd"
+	"yata-cli/yata"
 
 	//"github.com/tuxagon/yata-cli/cmd"
-	"github.com/tuxagon/yata-cli/debug"
+
 	"github.com/urfave/cli"
 )
 
@@ -31,8 +32,7 @@ func main() {
 	app.Usage = "A command line task manager"
 	app.Version = Version
 	app.Before = func(ctx *cli.Context) error {
-		debug.Verbose = ctx.GlobalBool("verbose")
-		debug.Println("info :: verbose logging enabled")
+		yata.NewDirectoryService()
 		return nil
 	}
 	app.Authors = []cli.Author{
