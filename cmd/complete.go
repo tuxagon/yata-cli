@@ -4,7 +4,6 @@ import (
 	"log"
 	"strconv"
 
-	"yata-cli/task"
 	"yata-cli/yata"
 
 	"github.com/urfave/cli"
@@ -31,11 +30,11 @@ func Complete(ctx *cli.Context) error {
 		}
 	}
 
-	m := task.NewFileManager()
-	task := m.GetTaskByID(uint32(id))
+	manager := yata.NewTaskManager()
+	task, _ := manager.GetByID(uint32(id))
 	if task != nil {
 		task.Completed = true
-		m.SaveTask(*task)
+		manager.Save(*task)
 	} else {
 		yata.PrintfColor("red+h", "Sorry, no task with an ID of %d was found", string(id))
 	}

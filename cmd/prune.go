@@ -1,16 +1,13 @@
 package cmd
 
 import (
-	"yata-cli/task"
+	"yata-cli/yata"
 
 	"github.com/urfave/cli"
 )
 
 // Prune removes any completed tasks
 func Prune(ctx *cli.Context) error {
-	m := task.NewFileManager()
-
-	m.Prune()
-
-	return nil
+	manager := yata.NewTaskManager()
+	return manager.Prune()
 }

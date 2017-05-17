@@ -32,7 +32,11 @@ func main() {
 	app.Usage = "A command line task manager"
 	app.Version = Version
 	app.Before = func(ctx *cli.Context) error {
-		yata.NewDirectoryService()
+		dirService := yata.NewDirectoryService()
+		if err := dirService.Initialize(); err != nil {
+			yata.PrintlnColor("red+h", err.Error())
+			os.Exit(1)
+		}
 		return nil
 	}
 	app.Authors = []cli.Author{

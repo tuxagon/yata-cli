@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -40,65 +40,159 @@ func NewDirectoryService() *DirectoryService {
 }
 
 // Initialize TODO docs
-func (s DirectoryService) Initialize() {
-	s.createRootPath()
-	s.createTasksFile()
-	s.createIDFile()
-	s.createConfigFile()
+func (s DirectoryService) Initialize() error {
+	inits := []func() error{
+		s.createRootPath,
+		s.createTasksFile,
+		s.createIDFile,
+		s.createConfigFile,
+	}
+	for _, f := range inits {
+		if err := f(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// GetCurrentID TODO docs
+func (s DirectoryService) GetCurrentID() (id uint32, err error) {
+	fullPath := s.getFullIDPath()
+	dat, err := ioutil.ReadFile(fullPath)
+	return binary.BigEndian.Uint32(dat), err
+}
+
+// GetAndIncreaseID TODO docs
+func (s DirectoryService) GetAndIncreaseID() (id uint32, err error) {
+	currentID, err := s.GetCurrentID()
+	if err != nil {
+		return 0, err
+	}
+
+	newID := currentID + 1
+	err = s.writeID(newID)
+	if err != nil {
+		return 0, err
+	}
+
+	return newID, nil
+}
+
+// Backup TODO docs
+func (s DirectoryService) Backup() error {
+	fullPath := s.getFullPath()
+	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		return err
+	}
+
+	dat, err := ioutil.ReadFile(fullPath)
+	if err != nil {
+		return err
+	}
+
+	backupPath, err := s.getBackupPath()
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(backupPath, dat, defaultPermission)
+}
+
+// Reset TODO docs
+func (s DirectoryService) Reset(resetID bool) error {
+	fullPath := s.getFullPath()
+	if _, err := os.Stat(fullPath); err == nil {
+		os.Remove(fullPath)
+	}
+
+	err := s.createTasksFile()
+	if err != nil {
+		return err
+	}
+
+	if resetID {
+		return s.writeID(0)
+	}
+	return nil
 }
 
 // createRootPath TODO docs
-func (s DirectoryService) createRootPath() {
+func (s DirectoryService) createRootPath() error {
 	_, err := os.Stat(s.RootPath)
 	if err != nil {
-		os.Mkdir(s.RootPath, defaultPermission)
+		return os.Mkdir(s.RootPath, defaultPermission)
 	}
+	return nil
 }
 
 // createTasksFile TODO docs
-func (s DirectoryService) createTasksFile() {
+func (s DirectoryService) createTasksFile() error {
 	fullPath := s.getFullPath()
-	if _, err := os.Stat(fullPath); err != nil {
-		ioutil.WriteFile(fullPath, []byte("[]"), defaultPermission)
+	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		return ioutil.WriteFile(fullPath, []byte("[]"), defaultPermission)
 	}
+	return nil
 }
 
 // createIDFile TODO docs
-func (s DirectoryService) createIDFile() {
+func (s DirectoryService) createIDFile() error {
 	fullPath := s.getFullIDPath()
 	if _, err := os.Stat(fullPath); err != nil {
-		s.writeID(0)
+		return s.writeID(0)
 	}
+	return nil
 }
 
 // createConfigFile TODO docs
-func (s DirectoryService) createConfigFile() {
+func (s DirectoryService) createConfigFile() error {
 	fullPath := s.getFullConfigPath()
 	if _, err := os.Stat(fullPath); err != nil {
-		ioutil.WriteFile(fullPath, []byte(defaultConfigContents), defaultPermission)
+		return ioutil.WriteFile(fullPath, []byte(defaultConfigContents), defaultPermission)
 	}
+	return nil
 }
 
 // getFullPath TODO docs
 func (s DirectoryService) getFullPath() string {
-	return path.Join(s.RootPath, s.Filename)
+	return filepath.Join(s.RootPath, s.Filename+".json")
 }
 
 // getFullIDPath TODO docs
 func (s DirectoryService) getFullIDPath() string {
-	return path.Join(s.RootPath, idFilename)
+	return filepath.Join(s.RootPath, idFilename)
 }
 
 // getFullConfigPath TODO docs
 func (s DirectoryService) getFullConfigPath() string {
-	return path.Join(s.RootPath, configFilename)
+	return filepath.Join(s.RootPath, configFilename)
+}
+
+// getBackupPath TODO docs
+func (s DirectoryService) getBackupPath() (string, error) {
+	files, err := ioutil.ReadDir(s.RootPath)
+	if err != nil {
+		return "", err
+	}
+	ext, n := ".bak", 0
+
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), ext) {
+			n++
+		}
+	}
+
+	if n > 0 {
+		ext = "." + string(n+int('0')) + ext
+	}
+
+	return s.getFullPath() + ext, nil
 }
 
 // writeID TODO docs
-func (s DirectoryService) writeID(id uint32) {
+func (s DirectoryService) writeID(id uint32) error {
 	bs := make([]byte, 4)
 	binary.BigEndian.PutUint32(bs, id)
-	ioutil.WriteFile(s.getFullIDPath(), bs, defaultPermission)
+	return ioutil.WriteFile(s.getFullIDPath(), bs, defaultPermission)
 }
 
 // getHomeDirectory will get the directory pointed to via the $HOME or %USERPROFILE%

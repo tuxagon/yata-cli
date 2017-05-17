@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"yata-cli/task"
 
 	//"github.com/tuxagon/yata-cli/task"
 	"strings"
@@ -33,19 +32,16 @@ func Add(ctx *cli.Context) error {
 	}
 
 	if priority == 0 || priority > 3 {
-		priority = task.Normal
+		priority = yata.NormalPriority
 	}
-
-	m := task.NewFileManager()
 
 	if flagTags != "" {
 		tags = strings.Split(flagTags, ",")
 	}
 
-	newTask := task.NewTask(description, tags, priority)
+	manager := yata.NewTaskManager()
+	newTask := yata.NewTask(description, tags, priority)
 	newTask.ExtractTags()
 
-	m.SaveTask(*newTask)
-
-	return nil
+	return manager.Save(*newTask)
 }

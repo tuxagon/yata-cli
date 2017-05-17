@@ -3,7 +3,6 @@ package cmd
 import (
 	"sort"
 
-	"yata-cli/task"
 	"yata-cli/yata"
 
 	//"github.com/tuxagon/yata-cli/task"
@@ -13,26 +12,29 @@ import (
 
 // List returns the list of tasks/todos that have been recorded
 func List(ctx *cli.Context) error {
-	var tasks []task.Task
-
 	sort := ctx.String("sort")
 	showAll := ctx.Bool("all")
 
-	m := task.NewFileManager()
-	if showAll {
-		tasks = m.GetAllTasks()
-	} else {
-		tasks = m.GetAllOpenTasks()
+	manager := yata.NewTaskManager()
+	tasks, err := manager.GetAll()
+	if err != nil {
+		return err
 	}
 
-	tasks = sortTasks(sort, tasks)
+	if !showAll {
+		tasks = yata.FilterTasks(tasks, func(t yata.Task) bool {
+			return !t.Completed
+		})
+	}
+
+	sortTasks(sort, &tasks)
 
 	for _, v := range tasks {
-		stringer := task.NewTaskStringer(v, task.Simple)
+		stringer := yata.NewTaskStringer(v, yata.Simple)
 		switch v.Priority {
-		case task.Low:
+		case yata.LowPriority:
 			yata.PrintlnColor("cyan+h", stringer.String())
-		case task.High:
+		case yata.HighPriority:
 			yata.PrintlnColor("red+h", stringer.String())
 		default:
 			yata.Println(stringer.String())
@@ -41,16 +43,15 @@ func List(ctx *cli.Context) error {
 	return nil
 }
 
-func sortTasks(sortField string, tasks []task.Task) []task.Task {
+func sortTasks(sortField string, tasks *[]yata.Task) {
 	switch {
 	case sortField == "priority":
-		sort.Sort(task.ByPriority(tasks))
+		sort.Sort(yata.ByPriority(*tasks))
 	case sortField == "description":
-		sort.Sort(task.ByDescription(tasks))
+		sort.Sort(yata.ByDescription(*tasks))
 	case sortField == "timestamp":
-		sort.Sort(task.ByTimestamp(tasks))
+		sort.Sort(yata.ByTimestamp(*tasks))
 	case sortField != "":
 		yata.PrintlnColor("yellow+h", "Sorry, but I can only sort using 'priority', 'description', or 'timestamp'. You should try one of those next time!")
 	}
-	return tasks
 }

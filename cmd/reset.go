@@ -1,24 +1,21 @@
 package cmd
 
 import (
-	"yata-cli/task"
-
 	"github.com/urfave/cli"
 	//"github.com/tuxagon/yata-cli/task"
+	"yata-cli/yata"
 )
 
 // Reset will erase any existing tasks and reset yata. By default,
 // the old tasks will be backed up
 func Reset(ctx *cli.Context) error {
-	m := task.NewFileManager()
+	backup := !ctx.Bool("no-backup")
+	resetID := !ctx.Bool("keep-id")
 
-	if !ctx.Bool("no-backup") {
-		m.BackUp()
-	}
-	if !ctx.Bool("keep-id") {
-		m.SetID(0)
-	}
-	m.Reset()
+	manager := yata.NewTaskManager()
 
-	return nil
+	if backup {
+		manager.Backup()
+	}
+	return manager.Reset(resetID)
 }

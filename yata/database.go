@@ -2,8 +2,8 @@ package yata
 
 // Database TODO docs
 type Database interface {
-	Read(v interface{}) error
-	Placeholder()
+	Read(collection string, v interface{}) error
+	Write(collection string, v interface{}) error
 }
 
 // NewDatabase TODO docs
