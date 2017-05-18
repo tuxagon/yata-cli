@@ -71,7 +71,7 @@ func Readln() (str string) {
 
 // ReadInt will read an integer from the configured io.Reader
 func ReadInt() (n int) {
-	_, err := fmt.Scanf("%d", &n)
+	_, err := fmt.Fscanf(in, "%d", &n)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

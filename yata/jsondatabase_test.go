@@ -1,6 +1,6 @@
 package yata
 
-import 
+import (
 	"testing"
 )
 

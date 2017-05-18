@@ -71,6 +71,20 @@ func (m TaskManager) Save(t Task) error {
 	return m.Database.Write(m.Collection, tasks)
 }
 
+// DeleteByID TODO docs
+func (m TaskManager) DeleteByID(id uint32) error {
+	tasks, err := m.GetAll()
+	if err != nil {
+		return err
+	}
+
+	tasks = FilterTasks(tasks, func(t Task) bool {
+		return t.ID != id
+	})
+
+	return m.Database.Write(m.Collection, tasks)
+}
+
 // Backup TODO docs
 func (m TaskManager) Backup() error {
 	dirService := NewDirectoryService()

@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	configFilename    = ".yataconfig"
-	defaultFilename   = "tasks"
+	configFilename    = ".yataconfig.json"
+	defaultFilename   = "tasks.json"
 	defaultPermission = 0777
 	rootDirectory     = ".yata"
 	idFilename        = ".yataid"
@@ -154,7 +154,7 @@ func (s DirectoryService) createConfigFile() error {
 
 // getFullPath TODO docs
 func (s DirectoryService) getFullPath() string {
-	return filepath.Join(s.RootPath, s.Filename+".json")
+	return filepath.Join(s.RootPath, s.Filename)
 }
 
 // getFullIDPath TODO docs

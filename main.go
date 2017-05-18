@@ -120,7 +120,6 @@ func delete() cli.Command {
 	return cli.Command{
 		Name:        "delete",
 		Action:      cmd.Delete,
-		Aliases:     []string{"del"},
 		Description: descDelete,
 		Flags: []cli.Flag{
 			cli.IntFlag{

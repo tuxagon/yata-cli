@@ -1,8 +1,19 @@
 package cmd
 
-import "github.com/urfave/cli"
+import (
+	"yata-cli/yata"
+
+	"github.com/urfave/cli"
+)
 
 // Delete Deletes a task
 func Delete(ctx *cli.Context) error {
-	return nil
+	id, err := promptForID(ctx)
+	if err != nil {
+		yata.PrintlnColor("red+h", err.Error())
+	}
+
+	manager := yata.NewTaskManager()
+
+	return manager.DeleteByID(uint32(id))
 }
