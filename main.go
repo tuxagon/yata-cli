@@ -193,5 +193,6 @@ func show() cli.Command {
 			},
 		},
 	}
+	sort.Sort(cli.FlagsByName(cmd.Flags))
 	return cmd
 }

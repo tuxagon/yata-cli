@@ -78,6 +78,21 @@ func (s DirectoryService) GetAndIncreaseID() (id uint32, err error) {
 	return newID, nil
 }
 
+// GetConfig TODO docs
+func (s DirectoryService) GetConfig() ([]byte, error) {
+	fullPath := s.getFullConfigPath()
+	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		return nil, err
+	}
+
+	return ioutil.ReadFile(fullPath)
+}
+
+// WriteConfig TODO docs
+func (s DirectoryService) WriteConfig(config []byte) error {
+	return ioutil.WriteFile(s.getFullConfigPath(), config, defaultPermission)
+}
+
 // Backup TODO docs
 func (s DirectoryService) Backup() error {
 	fullPath := s.getFullPath()

@@ -33,7 +33,7 @@
 - `[ ]` Config file `.yataconfig`
 
 # Delete command
-- `[ ]` Delete tasks
+- `[x]` Delete tasks
 
 # Import/Export commands
 - `[ ]` Import tasks from json
