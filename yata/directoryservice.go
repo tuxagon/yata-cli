@@ -2,6 +2,7 @@ package yata
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -17,7 +18,6 @@ const (
 	rootDirectory     = ".yata"
 	idFilename        = ".yataid"
 )
-const defaultConfigContents = `Some config stuff needs to go here and a format`
 
 var service *DirectoryService
 
@@ -162,7 +162,8 @@ func (s DirectoryService) createIDFile() error {
 func (s DirectoryService) createConfigFile() error {
 	fullPath := s.getFullConfigPath()
 	if _, err := os.Stat(fullPath); err != nil {
-		return ioutil.WriteFile(fullPath, []byte(defaultConfigContents), defaultPermission)
+		dat, _ := json.MarshalIndent(DefaultConfig(), "", "\t")
+		return s.WriteConfig(dat)
 	}
 	return nil
 }

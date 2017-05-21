@@ -53,6 +53,7 @@ func main() {
 	app.Commands = []cli.Command{
 		add(),
 		complete(),
+		config(),
 		delete(),
 		list(),
 		prune(),
@@ -113,6 +114,12 @@ func config() cli.Command {
 		Name:        "config",
 		Action:      cmd.Config,
 		Description: descConfig,
+		Flags: []cli.Flag{
+			cli.BoolFlag{
+				Name:  "show-keys,k",
+				Usage: "show the possible keys you can set/read",
+			},
+		},
 	}
 }
 
