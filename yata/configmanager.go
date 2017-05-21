@@ -18,6 +18,7 @@ type Config struct {
 }
 
 // GoogleDrive TODO docs
+// URL for generating API Key: https://support.google.com/googleapi/answer/6158862?hl=en&ref_topic=7013279
 type GoogleDrive struct {
 	APIKey string `json:"apiKey"`
 }

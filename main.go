@@ -22,6 +22,7 @@ const (
 	descDelete   = "Deletes a task"
 	descList     = "Lists the tasks"
 	descPrune    = "Removes all completed tasks"
+	descPush     = "Uploads the tasks file"
 	descReset    = "Erases all existing tasks and starts fresh"
 	descShow     = "Displays a task based on its ID"
 )
@@ -57,6 +58,7 @@ func main() {
 		delete(),
 		list(),
 		prune(),
+		push(),
 		reset(),
 		show(),
 	}
@@ -162,6 +164,21 @@ func prune() cli.Command {
 		Name:   "prune",
 		Usage:  descPrune,
 		Action: cmd.Prune,
+	}
+	return cmd
+}
+
+func push() cli.Command {
+	cmd := cli.Command{
+		Name:   "push",
+		Usage:  descPush,
+		Action: cmd.Push,
+		Flags: []cli.Flag{
+			cli.BoolFlag{
+				Name:  "google-drive,googledrive,drive,g",
+				Usage: "uploads tasks file to Google Drive if you have an API key set in the config",
+			},
+		},
 	}
 	return cmd
 }

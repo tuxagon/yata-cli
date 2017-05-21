@@ -28,9 +28,7 @@
 
 ## Config
 - `[x]` Handle "autoincrement" for files using `.yataid` file
-- `[ ]` Allow for task IDs to be transformed before save {prefix,suffix}
-- `[ ]` ~~Allow for task IDs to be UUIDs?~~
-- `[ ]` Config file `.yataconfig`
+- `[x]` Config file `.yataconfig`
 
 # Delete command
 - `[x]` Delete tasks
@@ -40,8 +38,8 @@
 - `[ ]` Export tasks to json
 
 ## List command
-- `[ ]` List all tasks unfiltered, unsorted
-- `[ ]` List all tasks sorted on specified field {created_at,description,priority}
+- `[x]` List all tasks unfiltered, unsorted
+- `[x]` List all tasks sorted on specified field {created_at,description,priority}
 - `[ ]` List all tasks that meet criteria {filter,completed,tag}
 - `[ ]` Change how the list renders {simple,verbose,printf}
 
