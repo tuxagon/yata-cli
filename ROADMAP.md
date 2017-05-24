@@ -20,7 +20,7 @@
 - `[x]` Add new task with only required fields {description}
 
 ## Archive command
-- `[ ]` Allow archiving of tasks
+- `[x]` Allow archiving of tasks
 - `[ ]` Should archiving based on a criteria be permitted?
 
 # Complete command 

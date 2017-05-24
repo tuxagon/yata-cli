@@ -17,6 +17,7 @@ const (
 	Version = "1.0.0"
 
 	descAdd      = "Create a new task"
+	descArchive  = "Create an archive backup of the current tasks"
 	descComplete = "Marks a task as done"
 	descConfig   = "Manage configuration options"
 	descDelete   = "Deletes a task"
@@ -53,6 +54,7 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		add(),
+		archive(),
 		complete(),
 		config(),
 		delete(),
@@ -91,6 +93,15 @@ func add() cli.Command {
 		},
 	}
 	sort.Sort(cli.FlagsByName(cmd.Flags))
+	return cmd
+}
+
+func archive() cli.Command {
+	cmd := cli.Command{
+		Name:        "archive",
+		Action:      cmd.Archive,
+		Description: descArchive,
+	}
 	return cmd
 }
 
