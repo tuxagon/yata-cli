@@ -8,7 +8,7 @@
 - `[x]` Allow filtering based on tag
 - `[x]` List all tags
 - `[ ]` ~~Change task from completed to incomplete?~~
-- `[ ]` Allow aliases to be set up to simplify commands
+- `[ ]` ~~Allow aliases to be set up to simplify commands~~
 - `[x]` Command line colors
 - `[ ]` ~~File-based and SQLite storage options~~
 - `[x]` Create a separate backup file if one already exists
