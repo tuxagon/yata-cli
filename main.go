@@ -160,9 +160,25 @@ func list() cli.Command {
 				Name:  "sort",
 				Usage: "sort the results by the specified field",
 			},
+			cli.StringFlag{
+				Name:  "tag,t",
+				Usage: "filter tasks by specified tag",
+			},
+			cli.StringFlag{
+				Name:  "description,desc,d",
+				Usage: "filter tasks by description using a contains search",
+			},
+			cli.StringFlag{
+				Name:  "format,f",
+				Usage: "specifies how the tasks should be displayed (json, default: simple)",
+			},
 			cli.BoolFlag{
 				Name:  "all,a",
 				Usage: "display all tasks, including completed",
+			},
+			cli.BoolFlag{
+				Name:  "show-tags",
+				Usage: "display tag information",
 			},
 		},
 	}
