@@ -9,22 +9,24 @@ import (
 	"strings"
 
 	"github.com/fatih/structs"
+	"golang.org/x/oauth2"
 )
 
 // Config TODO docs
 type Config struct {
-	GoogleDrive GoogleDrive `json:"googleDrive"`
-	Dropbox     Dropbox     `json:"dropbox"`
+	GoogleDrive GoogleDriveJSON `json:"googleDrive"`
+	Dropbox     DropboxJSON     `json:"dropbox"`
 }
 
-// GoogleDrive TODO docs
-// URL for generating API Key: https://support.google.com/googleapi/answer/6158862?hl=en&ref_topic=7013279
-type GoogleDrive struct {
-	APIKey string `json:"apiKey"`
+// GoogleDriveJSON TODO docs
+// URL to generate secret file: https://developers.google.com/drive/v3/web/quickstart/go
+type GoogleDriveJSON struct {
+	OAuthToken *oauth2.Token `json:"oauthToken"`
+	SecretFile string        `json:"secretFile"`
 }
 
-// Dropbox TODO docs
-type Dropbox struct {
+// DropboxJSON TODO docs
+type DropboxJSON struct {
 	APIKey string `json:"apiKey"`
 }
 
