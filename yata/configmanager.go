@@ -92,8 +92,14 @@ func (m ConfigManager) SetKey(key string, value interface{}) error {
 	keys := strings.Split(strings.ToLower(key), ".")
 	writeConfigKey(keys, value, configMap)
 
+	dat, err := json.Marshal(configMap)
+	if err != nil {
+		return err
+	}
+	json.Unmarshal(dat, &m.Config)
+
 	dirService := NewDirectoryService()
-	dat, err := json.MarshalIndent(configMap, "", "\t")
+	dat, err = json.MarshalIndent(m.Config, "", "\t")
 	if err != nil {
 		return err
 	}

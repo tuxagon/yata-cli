@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/skratchdot/open-golang/open"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
@@ -73,12 +74,12 @@ func (m GoogleDriveManager) Push() error {
 		return err
 	}
 
-	f := &drive.File{
+	fileMetadata := &drive.File{
 		Name:    "tasks.json",
 		Parents: []string{"appDataFolder"},
 	}
 
-	_, err = srv.Files.Create(f).Do()
+	_, err = srv.Files.Create(fileMetadata).Do()
 	if err != nil {
 		return err
 	}
@@ -122,6 +123,7 @@ func (m GoogleDriveManager) tokenFromConfig() (*oauth2.Token, error) {
 
 func (m GoogleDriveManager) tokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	open.Run(authURL)
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
 

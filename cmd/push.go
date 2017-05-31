@@ -8,7 +8,20 @@ import (
 
 // Push TODO docs
 func Push(ctx *cli.Context) error {
-	manager := yata.NewServerManager(yata.GoogleDrive)
+	drivePush := ctx.Bool("google-drive")
+
+	if drivePush {
+		err := serverPush(yata.GoogleDrive)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func serverPush(serverType int) error {
+	manager := yata.NewServerManager(serverType)
 
 	if err := manager.Push(); err != nil {
 		yata.PrintlnColor("red+h", err.Error())
