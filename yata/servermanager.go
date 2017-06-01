@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/skratchdot/open-golang/open"
@@ -20,6 +21,13 @@ const (
 )
 
 const noServerMsgFmt = "I would love to %s your tasks %s a server, but I don't see any configured yet! If you want to configure a server, type `yata %s --help`"
+
+var PushableFiles = []struct {
+	Name, Path string
+}{
+	{Name: "tasks.json", Path: NewDirectoryService().GetFullPath()},
+	{Name: ".yataid", Path: NewDirectoryService().GetFullIDPath()},
+}
 
 // ServerManager TODO docs
 type ServerManager interface {
@@ -74,6 +82,8 @@ func (m GoogleDriveManager) Push() error {
 		return err
 	}
 
+	return m.saveFiles(srv)
+
 	fileMetadata := &drive.File{
 		Name:    "tasks.json",
 		Parents: []string{"appDataFolder"},
@@ -89,6 +99,51 @@ func (m GoogleDriveManager) Push() error {
 
 // Fetch TODO docs
 func (m GoogleDriveManager) Fetch() error {
+	return nil
+}
+
+func (m GoogleDriveManager) saveFiles(srv *drive.Service) error {
+	fileList, err := srv.Files.List().Spaces("appDataFolder").Fields("nextPageToken, files(id, name)").PageSize(10).Do()
+	if err != nil {
+		return err
+	}
+
+	if len(fileList.Files) > 0 {
+		for _, pf := range PushableFiles {
+			var found bool
+
+			fileMetadata := drive.File{
+				Name:    pf.Name,
+				Parents: []string{"appDataFolder"},
+			}
+
+			file, err := os.Open(pf.Path)
+			if err != nil {
+				return err
+			}
+
+			for _, f := range fileList.Files {
+				if f.Name == pf.Name {
+					found = true
+
+					_, err = srv.Files.Update(f.Id, &fileMetadata).Media(file).Do()
+					if err != nil {
+						return err
+					}
+
+					break
+				}
+			}
+
+			if !found {
+				_, err = srv.Files.Create(&fileMetadata).Media(file).Do()
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
 	return nil
 }
 
