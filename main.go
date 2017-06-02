@@ -21,9 +21,10 @@ const (
 	descComplete = "Marks a task as done"
 	descConfig   = "Manage configuration options"
 	descDelete   = "Deletes a task"
+	descFetch    = "Fetches the data from the specified service"
 	descList     = "Lists the tasks"
 	descPrune    = "Removes all completed tasks"
-	descPush     = "Uploads the tasks file"
+	descPush     = "Uploads tasks data to the specified service"
 	descReset    = "Erases all existing tasks and starts fresh"
 	descShow     = "Displays a task based on its ID"
 )
@@ -58,6 +59,7 @@ func main() {
 		complete(),
 		config(),
 		delete(),
+		fetch(),
 		list(),
 		prune(),
 		push(),
@@ -145,6 +147,20 @@ func delete() cli.Command {
 			cli.IntFlag{
 				Name:  "id",
 				Usage: "specify the ID of the task to delete",
+			},
+		},
+	}
+}
+
+func fetch() cli.Command {
+	return cli.Command{
+		Name:        "fetch",
+		Action:      cmd.Fetch,
+		Description: descFetch,
+		Flags: []cli.Flag{
+			cli.BoolFlag{
+				Name:  "google-drive,googledrive,drive,g",
+				Usage: "uploads tasks file to Google Drive if you have an API key set in the config",
 			},
 		},
 	}

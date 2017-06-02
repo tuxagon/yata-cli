@@ -15,6 +15,7 @@ const (
 	configFilename    = ".yataconfig.json"
 	defaultFilename   = "tasks.json"
 	defaultPermission = 0777
+	fetchRoot         = ".fetch"
 	rootDirectory     = ".yata"
 	idFilename        = ".yataid"
 )
@@ -43,6 +44,7 @@ func NewDirectoryService() *DirectoryService {
 func (s DirectoryService) Initialize() error {
 	inits := []func() error{
 		s.createRootPath,
+		s.createFetchPath,
 		s.createTasksFile,
 		s.createIDFile,
 		s.createConfigFile,
@@ -131,11 +133,26 @@ func (s DirectoryService) Reset(resetID bool) error {
 	return nil
 }
 
+// ClearFetchFiles TODO docs
+func (s DirectoryService) ClearFetchFiles() {
+	os.RemoveAll(s.GetFetchPath())
+	s.createFetchPath()
+}
+
 // createRootPath TODO docs
 func (s DirectoryService) createRootPath() error {
 	_, err := os.Stat(s.RootPath)
 	if err != nil {
 		return os.Mkdir(s.RootPath, defaultPermission)
+	}
+	return nil
+}
+
+// createFetchPath TODO docs
+func (s DirectoryService) createFetchPath() error {
+	fetchPath := s.GetFetchPath()
+	if _, err := os.Stat(fetchPath); err != nil {
+		return os.Mkdir(fetchPath, defaultPermission)
 	}
 	return nil
 }
@@ -168,22 +185,26 @@ func (s DirectoryService) createConfigFile() error {
 	return nil
 }
 
-// getFullPath TODO docs
+// GetFullPath TODO docs
 func (s DirectoryService) GetFullPath() string {
 	return filepath.Join(s.RootPath, s.Filename)
 }
 
-// getFullIDPath TODO docs
+func (s DirectoryService) GetFetchPath() string {
+	return filepath.Join(s.RootPath, fetchRoot)
+}
+
+// GetFullIDPath TODO docs
 func (s DirectoryService) GetFullIDPath() string {
 	return filepath.Join(s.RootPath, idFilename)
 }
 
-// getFullConfigPath TODO docs
+// GetFullConfigPath TODO docs
 func (s DirectoryService) GetFullConfigPath() string {
 	return filepath.Join(s.RootPath, configFilename)
 }
 
-// getBackupPath TODO docs
+// GetBackupPath TODO docs
 func (s DirectoryService) GetBackupPath() (string, error) {
 	files, err := ioutil.ReadDir(s.RootPath)
 	if err != nil {

@@ -41,15 +41,18 @@ type NoServerManager struct{}
 // GoogleDriveManager TODO docs
 type GoogleDriveManager struct {
 	cfgMgr *ConfigManager
+	srv    *drive.Service
 }
 
 // NewServerManager TODO docs
 func NewServerManager(serverType int) ServerManager {
 	switch serverType {
 	case GoogleDrive:
-		return &GoogleDriveManager{
+		m := &GoogleDriveManager{
 			cfgMgr: NewConfigManager(),
 		}
+		m.setService()
+		return m
 	default:
 		return &NoServerManager{}
 	}
@@ -67,43 +70,7 @@ func (m NoServerManager) Fetch() error {
 
 // Push TODO docs
 func (m GoogleDriveManager) Push() error {
-	cfg, err := m.getConfig()
-	if err != nil {
-		return err
-	}
-	ctx := context.Background()
-	client, err := m.getClient(ctx, cfg)
-	if err != nil {
-		return err
-	}
-
-	srv, err := drive.New(client)
-	if err != nil {
-		return err
-	}
-
-	return m.saveFiles(srv)
-
-	fileMetadata := &drive.File{
-		Name:    "tasks.json",
-		Parents: []string{"appDataFolder"},
-	}
-
-	_, err = srv.Files.Create(fileMetadata).Do()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Fetch TODO docs
-func (m GoogleDriveManager) Fetch() error {
-	return nil
-}
-
-func (m GoogleDriveManager) saveFiles(srv *drive.Service) error {
-	fileList, err := srv.Files.List().Spaces("appDataFolder").Fields("nextPageToken, files(id, name)").PageSize(10).Do()
+	fileList, err := m.appDataFiles()
 	if err != nil {
 		return err
 	}
@@ -113,8 +80,7 @@ func (m GoogleDriveManager) saveFiles(srv *drive.Service) error {
 			var found bool
 
 			fileMetadata := drive.File{
-				Name:    pf.Name,
-				Parents: []string{"appDataFolder"},
+				Name: pf.Name,
 			}
 
 			file, err := os.Open(pf.Path)
@@ -126,7 +92,7 @@ func (m GoogleDriveManager) saveFiles(srv *drive.Service) error {
 				if f.Name == pf.Name {
 					found = true
 
-					_, err = srv.Files.Update(f.Id, &fileMetadata).Media(file).Do()
+					_, err = m.srv.Files.Update(f.Id, &fileMetadata).Media(file).AddParents("appDataFolder").Do()
 					if err != nil {
 						return err
 					}
@@ -136,7 +102,8 @@ func (m GoogleDriveManager) saveFiles(srv *drive.Service) error {
 			}
 
 			if !found {
-				_, err = srv.Files.Create(&fileMetadata).Media(file).Do()
+				fileMetadata.Parents = []string{"appDataFolder"}
+				_, err = m.srv.Files.Create(&fileMetadata).Media(file).Do()
 				if err != nil {
 					return err
 				}
@@ -147,9 +114,47 @@ func (m GoogleDriveManager) saveFiles(srv *drive.Service) error {
 	return nil
 }
 
+// Fetch TODO docs
+func (m GoogleDriveManager) Fetch() error {
+	NewDirectoryService().ClearFetchFiles()
+
+	fileList, err := m.appDataFiles()
+	if err != nil {
+		return err
+	}
+
+	for _, f := range fileList.Files {
+		resp, err := m.srv.Files.Get(f.Id).Download()
+		if err != nil {
+			return err
+		}
+
+		PrintlnColor("green+hb", f.Name)
+
+		var dat []byte
+		_, err = resp.Body.Read(dat)
+		if err != nil {
+			PrintlnColor("yellow+h", err.Error())
+			continue
+		}
+
+		PrintlnColor("cyan+h", string(dat))
+
+		path := filepath.Join(NewDirectoryService().GetFetchPath(), f.Name)
+		ioutil.WriteFile(path, dat, defaultPermission)
+	}
+
+	return nil
+}
+
+// appDataFiles TODO docs
+func (m GoogleDriveManager) appDataFiles() (*drive.FileList, error) {
+	return m.srv.Files.List().Spaces("appDataFolder").Fields("nextPageToken, files(id, name)").PageSize(10).Do()
+}
+
+// getConfig TODO docs
 func (m GoogleDriveManager) getConfig() (*oauth2.Config, error) {
-	dirSrv := NewDirectoryService()
-	secPath := filepath.Join(dirSrv.RootPath, m.cfgMgr.Config.GoogleDrive.SecretFile)
+	secPath := filepath.Join(NewDirectoryService().RootPath, m.cfgMgr.Config.GoogleDrive.SecretFile)
 
 	dat, err := ioutil.ReadFile(secPath)
 	if err != nil {
@@ -159,6 +164,14 @@ func (m GoogleDriveManager) getConfig() (*oauth2.Config, error) {
 	return google.ConfigFromJSON(dat, drive.DriveAppdataScope)
 }
 
+// setService TODO docs
+func (m *GoogleDriveManager) setService() {
+	cfg, _ := m.getConfig()
+	client, _ := m.getClient(context.Background(), cfg)
+	m.srv, _ = drive.New(client)
+}
+
+// getClient TODO docs
 func (m GoogleDriveManager) getClient(ctx context.Context, config *oauth2.Config) (*http.Client, error) {
 	tok, err := m.tokenFromConfig()
 	if err != nil {
@@ -168,14 +181,16 @@ func (m GoogleDriveManager) getClient(ctx context.Context, config *oauth2.Config
 	return config.Client(ctx, tok), nil
 }
 
+// tokenFromConfig TODO docs
 func (m GoogleDriveManager) tokenFromConfig() (*oauth2.Token, error) {
 	tok := m.cfgMgr.Config.GoogleDrive.OAuthToken
-	if tok.Valid() {
+	if tok != nil {
 		return tok, nil
 	}
 	return nil, fmt.Errorf("Invalid token")
 }
 
+// tokenFromWeb TODO docs
 func (m GoogleDriveManager) tokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	open.Run(authURL)
@@ -194,6 +209,7 @@ func (m GoogleDriveManager) tokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	return tok
 }
 
+// saveToken TODO docs
 func (m GoogleDriveManager) saveToken(tok *oauth2.Token) {
 	m.cfgMgr.SetKey("googledrive.oauthtoken", tok)
 }
