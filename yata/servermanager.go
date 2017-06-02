@@ -3,6 +3,7 @@ package yata
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -75,38 +76,39 @@ func (m GoogleDriveManager) Push() error {
 		return err
 	}
 
-	if len(fileList.Files) > 0 {
-		for _, pf := range PushableFiles {
-			var found bool
+	for _, pf := range PushableFiles {
+		var found bool
 
-			fileMetadata := drive.File{
-				Name: pf.Name,
-			}
+		fileMetadata := drive.File{
+			Name: pf.Name,
+		}
 
-			file, err := os.Open(pf.Path)
-			if err != nil {
-				return err
-			}
+		file, err := os.Open(pf.Path)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			file.Close()
+		}()
 
-			for _, f := range fileList.Files {
-				if f.Name == pf.Name {
-					found = true
+		for _, f := range fileList.Files {
+			if f.Name == pf.Name {
+				found = true
 
-					_, err = m.srv.Files.Update(f.Id, &fileMetadata).Media(file).AddParents("appDataFolder").Do()
-					if err != nil {
-						return err
-					}
-
-					break
-				}
-			}
-
-			if !found {
-				fileMetadata.Parents = []string{"appDataFolder"}
-				_, err = m.srv.Files.Create(&fileMetadata).Media(file).Do()
+				_, err = m.srv.Files.Update(f.Id, &fileMetadata).Media(file).Do()
 				if err != nil {
 					return err
 				}
+
+				break
+			}
+		}
+
+		if !found {
+			fileMetadata.Parents = []string{"appDataFolder"}
+			_, err = m.srv.Files.Create(&fileMetadata).Media(file).Do()
+			if err != nil {
+				return err
 			}
 		}
 	}
@@ -131,17 +133,30 @@ func (m GoogleDriveManager) Fetch() error {
 
 		PrintlnColor("green+hb", f.Name)
 
-		var dat []byte
-		_, err = resp.Body.Read(dat)
-		if err != nil {
-			PrintlnColor("yellow+h", err.Error())
-			continue
-		}
-
-		PrintlnColor("cyan+h", string(dat))
-
+		buf := make([]byte, 1024)
 		path := filepath.Join(NewDirectoryService().GetFetchPath(), f.Name)
-		ioutil.WriteFile(path, dat, defaultPermission)
+		for {
+			n, err := resp.Body.Read(buf)
+			if err != nil && err != io.EOF {
+				return err
+			}
+
+			if n == 0 {
+				break
+			}
+
+			fo, err := os.Create(path)
+			if err != nil {
+				return err
+			}
+			defer func() {
+				fo.Close()
+			}()
+
+			if _, err := fo.Write(buf[:n]); err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
