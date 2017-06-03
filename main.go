@@ -23,6 +23,7 @@ const (
 	descDelete   = "Deletes a task"
 	descFetch    = "Fetches the data from the specified service"
 	descList     = "Lists the tasks"
+	descMerge    = "Merges the fetched tasks with the current tasks"
 	descPrune    = "Removes all completed tasks"
 	descPush     = "Uploads tasks data to the specified service"
 	descReset    = "Erases all existing tasks and starts fresh"
@@ -61,6 +62,7 @@ func main() {
 		delete(),
 		fetch(),
 		list(),
+		merge(),
 		prune(),
 		push(),
 		reset(),
@@ -75,10 +77,11 @@ func main() {
 
 func add() cli.Command {
 	cmd := cli.Command{
-		Name:    "add",
-		Action:  cmd.Add,
-		Aliases: []string{"new", "create"},
-		Usage:   descAdd,
+		Name:        "add",
+		Action:      cmd.Add,
+		Aliases:     []string{"new", "create"},
+		Usage:       descAdd,
+		Description: descAdd,
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "description,desc,d",
@@ -102,6 +105,7 @@ func archive() cli.Command {
 	cmd := cli.Command{
 		Name:        "archive",
 		Action:      cmd.Archive,
+		Usage:       descArchive,
 		Description: descArchive,
 	}
 	return cmd
@@ -113,6 +117,7 @@ func complete() cli.Command {
 		Action:      cmd.Complete,
 		Aliases:     []string{"finish"},
 		Description: descComplete,
+		Usage:       descComplete,
 		Flags: []cli.Flag{
 			cli.IntFlag{
 				Name:  "id",
@@ -129,6 +134,7 @@ func config() cli.Command {
 		Name:        "config",
 		Action:      cmd.Config,
 		Description: descConfig,
+		Usage:       descConfig,
 		Flags: []cli.Flag{
 			cli.BoolFlag{
 				Name:  "show-keys,k",
@@ -143,6 +149,7 @@ func delete() cli.Command {
 		Name:        "delete",
 		Action:      cmd.Delete,
 		Description: descDelete,
+		Usage:       descDelete,
 		Flags: []cli.Flag{
 			cli.IntFlag{
 				Name:  "id",
@@ -157,6 +164,7 @@ func fetch() cli.Command {
 		Name:        "fetch",
 		Action:      cmd.Fetch,
 		Description: descFetch,
+		Usage:       descFetch,
 		Flags: []cli.Flag{
 			cli.BoolFlag{
 				Name:  "google-drive,googledrive,drive,g",
@@ -168,9 +176,10 @@ func fetch() cli.Command {
 
 func list() cli.Command {
 	cmd := cli.Command{
-		Name:   "list",
-		Action: cmd.List,
-		Usage:  descList,
+		Name:        "list",
+		Action:      cmd.List,
+		Usage:       descList,
+		Description: descList,
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "sort",
@@ -202,20 +211,32 @@ func list() cli.Command {
 	return cmd
 }
 
+func merge() cli.Command {
+	cmd := cli.Command{
+		Name:        "merge",
+		Usage:       descMerge,
+		Description: descMerge,
+		Action:      cmd.Merge,
+	}
+	return cmd
+}
+
 func prune() cli.Command {
 	cmd := cli.Command{
-		Name:   "prune",
-		Usage:  descPrune,
-		Action: cmd.Prune,
+		Name:        "prune",
+		Usage:       descPrune,
+		Description: descPrune,
+		Action:      cmd.Prune,
 	}
 	return cmd
 }
 
 func push() cli.Command {
 	cmd := cli.Command{
-		Name:   "push",
-		Usage:  descPush,
-		Action: cmd.Push,
+		Name:        "push",
+		Usage:       descPush,
+		Description: descPush,
+		Action:      cmd.Push,
 		Flags: []cli.Flag{
 			cli.BoolFlag{
 				Name:  "google-drive,googledrive,drive,g",
@@ -230,6 +251,7 @@ func reset() cli.Command {
 	cmd := cli.Command{
 		Name:        "reset",
 		Action:      cmd.Reset,
+		Usage:       descReset,
 		Description: descReset,
 		Aliases:     []string{"nuke"},
 		Flags: []cli.Flag{
@@ -252,6 +274,7 @@ func show() cli.Command {
 		Name:        "show",
 		Action:      cmd.Show,
 		Aliases:     []string{"get"},
+		Usage:       descShow,
 		Description: descShow,
 		Flags: []cli.Flag{
 			cli.IntFlag{

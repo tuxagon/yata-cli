@@ -111,6 +111,57 @@ func (m TaskManager) Prune() error {
 	return m.Database.Write(m.Collection, tasks)
 }
 
+// MergeFetchFiles TODO docs
+func (m TaskManager) MergeFetchFiles() error {
+	fetchDB := NewDatabase(NewDirectoryService().GetFetchPath())
+	fetchTasks := make([]Task, 0)
+	fetchDB.Read(m.Collection, &fetchTasks)
+	tasks, err := m.GetAll()
+	if err != nil {
+		return err
+	}
+	maxID, err := NewDirectoryService().GetCurrentID()
+	if err != nil {
+		return err
+	}
+
+	hasUUID := func(tasks []Task, uuid string) bool {
+		for _, t := range tasks {
+			if t.UUID == uuid {
+				return true
+			}
+		}
+		return false
+	}
+
+	hasID := func(tasks []Task, id uint32) bool {
+		for _, t := range tasks {
+			if t.ID == id {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, ft := range fetchTasks {
+		if hasID(tasks, ft.ID) {
+			ft.ID, maxID = maxID+1, maxID+1
+		}
+
+		if !hasUUID(tasks, ft.UUID) {
+			tasks = append(tasks, ft)
+		}
+
+		if maxID < ft.ID {
+			maxID = ft.ID + 1
+		}
+	}
+
+	NewDirectoryService().WriteID(maxID)
+
+	return m.Database.Write(m.Collection, tasks)
+}
+
 // changeIDIfZero TODO docs
 func changeIDIfZero(t *Task) error {
 	dirService := NewDirectoryService()

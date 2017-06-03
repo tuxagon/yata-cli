@@ -54,6 +54,9 @@ type ByDescription []Task
 // ByTimestamp TODO docs
 type ByTimestamp []Task
 
+// ByID TODO docs
+type ByID []Task
+
 func (t ByPriority) Len() int           { return len(t) }
 func (t ByPriority) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 func (t ByPriority) Less(i, j int) bool { return t[i].Priority < t[j].Priority }
@@ -65,6 +68,10 @@ func (t ByDescription) Less(i, j int) bool { return t[i].Description < t[j].Desc
 func (t ByTimestamp) Len() int           { return len(t) }
 func (t ByTimestamp) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 func (t ByTimestamp) Less(i, j int) bool { return t[i].Timestamp < t[j].Timestamp }
+
+func (t ByID) Len() int           { return len(t) }
+func (t ByID) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+func (t ByID) Less(i, j int) bool { return t[i].ID < t[j].ID }
 
 // NewTask TODO docs
 func NewTask(description string, tags []string, priority int) *Task {

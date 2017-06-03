@@ -23,6 +23,7 @@ const (
 
 const noServerMsgFmt = "I would love to %s your tasks %s a server, but I don't see any configured yet! If you want to configure a server, type `yata %s --help`"
 
+// PushableFiles TODO docs
 var PushableFiles = []struct {
 	Name, Path string
 }{
@@ -130,8 +131,6 @@ func (m GoogleDriveManager) Fetch() error {
 		if err != nil {
 			return err
 		}
-
-		PrintlnColor("green+hb", f.Name)
 
 		buf := make([]byte, 1024)
 		path := filepath.Join(NewDirectoryService().GetFetchPath(), f.Name)

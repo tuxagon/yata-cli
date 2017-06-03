@@ -60,8 +60,8 @@ func sortTasks(sortField string, tasks *[]yata.Task) {
 		sort.Sort(yata.ByDescription(*tasks))
 	case sortField == "timestamp":
 		sort.Sort(yata.ByTimestamp(*tasks))
-	case sortField != "":
-		yata.PrintlnColor("yellow+h", "Sorry, but I can only sort using 'priority', 'description', or 'timestamp'. You should try one of those next time!")
+	default:
+		sort.Sort(yata.ByID(*tasks))
 	}
 }
 
