@@ -14,7 +14,7 @@ import (
 
 const (
 	// Version specifies the current release
-	Version = "1.0.0"
+	Version = "1.1.0"
 
 	descAdd      = "Create a new task"
 	descArchive  = "Create an archive backup of the current tasks"
@@ -280,6 +280,10 @@ func show() cli.Command {
 			cli.IntFlag{
 				Name:  "id",
 				Usage: "specify the ID of the task to complete",
+			},
+			cli.StringFlag{
+				Name:  "format,f",
+				Usage: "specifies how the task should be displayed (json, default: simple)",
 			},
 		},
 	}

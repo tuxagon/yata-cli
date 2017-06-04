@@ -1,32 +1,30 @@
 package cmd
 
 import (
-	"yata-cli/yata"
-
+	"github.com/tuxagon/yata-cli/yata"
 	"github.com/urfave/cli"
 )
 
+type pushArgs struct {
+	googleDrive bool
+}
+
+func (a *pushArgs) Parse(ctx *cli.Context) {
+	a.googleDrive = ctx.Bool("google-drive")
+}
+
 // Push TODO docs
 func Push(ctx *cli.Context) error {
-	drivePush := ctx.Bool("google-drive")
+	args := &pushArgs{}
+	args.Parse(ctx)
 
-	if drivePush {
-		err := serverPush(yata.GoogleDrive)
-		if err != nil {
-			return err
-		}
+	if args.googleDrive {
+		handleError(serverPush(yata.GoogleDrive))
 	}
 
 	return nil
 }
 
 func serverPush(serverType int) error {
-	manager := yata.NewServerManager(serverType)
-
-	if err := manager.Push(); err != nil {
-		yata.PrintlnColor("red+h", err.Error())
-		return err
-	}
-
-	return nil
+	return yata.NewServerManager(serverType).Push()
 }

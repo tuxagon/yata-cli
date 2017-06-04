@@ -59,7 +59,7 @@ type ByID []Task
 
 func (t ByPriority) Len() int           { return len(t) }
 func (t ByPriority) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
-func (t ByPriority) Less(i, j int) bool { return t[i].Priority < t[j].Priority }
+func (t ByPriority) Less(i, j int) bool { return t[i].Priority > t[j].Priority }
 
 func (t ByDescription) Len() int           { return len(t) }
 func (t ByDescription) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }

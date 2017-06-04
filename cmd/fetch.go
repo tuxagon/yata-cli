@@ -1,32 +1,30 @@
 package cmd
 
 import (
-	"yata-cli/yata"
-
+	"github.com/tuxagon/yata-cli/yata"
 	"github.com/urfave/cli"
 )
 
-// Fetch TODO docs
-func Fetch(ctx *cli.Context) error {
-	driveFetch := ctx.Bool("google-drive")
+type fetchArgs struct {
+	googleDrive bool
+}
 
-	if driveFetch {
-		err := serverFetch(yata.GoogleDrive)
-		if err != nil {
-			return err
-		}
+func (a *fetchArgs) Parse(ctx *cli.Context) {
+	a.googleDrive = ctx.Bool("google-drive")
+}
+
+// Fetch downloads any files applicable to yata from the specified server
+func Fetch(ctx *cli.Context) error {
+	args := &fetchArgs{}
+	args.Parse(ctx)
+
+	if args.googleDrive {
+		handleError(serverFetch(yata.GoogleDrive))
 	}
 
 	return nil
 }
 
 func serverFetch(serverType int) error {
-	manager := yata.NewServerManager(serverType)
-
-	if err := manager.Fetch(); err != nil {
-		yata.PrintlnColor("red+h", err.Error())
-		return err
-	}
-
-	return nil
+	return yata.NewServerManager(serverType).Fetch()
 }
