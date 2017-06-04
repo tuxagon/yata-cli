@@ -4,11 +4,8 @@ import (
 	"os"
 	"sort"
 
-	"yata-cli/cmd"
-	"yata-cli/yata"
-
-	//"github.com/tuxagon/yata-cli/cmd"
-
+	"github.com/tuxagon/yata-cli/cmd"
+	"github.com/tuxagon/yata-cli/yata"
 	"github.com/urfave/cli"
 )
 
