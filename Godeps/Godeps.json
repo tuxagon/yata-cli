@@ -1,0 +1,97 @@
+{
+	"ImportPath": "yata-cli",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "cloud.google.com/go/compute/metadata",
+			"Comment": "v0.7.0-152-g0625e1e",
+			"Rev": "0625e1e4bfc1aa7a07d6285541fa9020feab1013"
+		},
+		{
+			"ImportPath": "github.com/fatih/structs",
+			"Comment": "v1.0-2-g74a29b9",
+			"Rev": "74a29b9fac7397d933f47e33eba94d2d83a464a2"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-colorable",
+			"Comment": "v0.0.7-24-gded68f7",
+			"Rev": "ded68f7a9561c023e790de24279db7ebf473ea80"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-isatty",
+			"Comment": "v0.0.2",
+			"Rev": "fc9e8d8ef48496124e79ae0df75490096eccf6fe"
+		},
+		{
+			"ImportPath": "github.com/mgutz/ansi",
+			"Rev": "9520e82c474b0a04dd04f8a40959027271bab992"
+		},
+		{
+			"ImportPath": "github.com/nu7hatch/gouuid",
+			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
+		},
+		{
+			"ImportPath": "github.com/skratchdot/open-golang/open",
+			"Rev": "75fb7ed4208cf72d323d7d02fd1a5964a7a9073c"
+		},
+		{
+			"ImportPath": "github.com/tuxagon/yata-cli/yata",
+			"Comment": "v1.0",
+			"Rev": "cbf7796a4f8915f9ffe962a32f6b280e0ab306fd"
+		},
+		{
+			"ImportPath": "github.com/urfave/cli",
+			"Comment": "v1.19.1-36-gd70f47e",
+			"Rev": "d70f47eeca3afd795160003bc6e28b001d60c67c"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "513929065c19401a1c7b76ecd942f9f86a0c061b"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context/ctxhttp",
+			"Rev": "513929065c19401a1c7b76ecd942f9f86a0c061b"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "f047394b6d14284165300fd82dad67edb3a4d7f6"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/google",
+			"Rev": "f047394b6d14284165300fd82dad67edb3a4d7f6"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/internal",
+			"Rev": "f047394b6d14284165300fd82dad67edb3a4d7f6"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/jws",
+			"Rev": "f047394b6d14284165300fd82dad67edb3a4d7f6"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/jwt",
+			"Rev": "f047394b6d14284165300fd82dad67edb3a4d7f6"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "b90f89a1e7a9c1f6b918820b3daa7f08488c8594"
+		},
+		{
+			"ImportPath": "google.golang.org/api/drive/v3",
+			"Rev": "d9d64fe74969b80fb4a435ae9280c9ff061a6097"
+		},
+		{
+			"ImportPath": "google.golang.org/api/gensupport",
+			"Rev": "d9d64fe74969b80fb4a435ae9280c9ff061a6097"
+		},
+		{
+			"ImportPath": "google.golang.org/api/googleapi",
+			"Rev": "d9d64fe74969b80fb4a435ae9280c9ff061a6097"
+		},
+		{
+			"ImportPath": "google.golang.org/api/googleapi/internal/uritemplates",
+			"Rev": "d9d64fe74969b80fb4a435ae9280c9ff061a6097"
+		}
+	]
+}
