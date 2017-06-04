@@ -1,5 +1,7 @@
 ## Yata CLI
 
+[![Build Status](https://travis-ci.org/tuxagon/yata-cli.svg?branch=master)](https://travis-ci.org/tuxagon/yata-cli)
+
 Yata is a command line task manager that works on Windows, Mac, and Linux. The idea for it came because I was frustrated with the other 
 alternatives I found and I really only wanted a simple task manager. I really wanted git, but for tasks. This is what yata wants to be.
 
