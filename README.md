@@ -64,6 +64,8 @@ You should have a file called `client_secret.json` at the end, which should be p
 
 Once that file is in the `.yata` directory, you can just push and Yata will walk you through the rest of the setup, which involves authorizing the Yata.
 
+**Note**: You will also need to run `yata config googledrive.secretfile client_secret.json`
+
 ### Usage
 
 ```shell
