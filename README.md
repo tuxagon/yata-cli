@@ -26,7 +26,7 @@ $ yata list # Lists the current open tasks
 $ yata complete 1 # Marks the task with ID 1 as completed
 ```
 
-# Tagging
+## Tagging
 
 Tags are used to essentially label a task
 
