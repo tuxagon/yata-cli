@@ -1,32 +1,41 @@
 package yata
 
 import (
-	"io"
+	"fmt"
 	"os"
 	"path/filepath"
 )
 
 const logFile = ".yatalog"
+const (
+	LogVerbose = iota
+	LogInfo
+	LogWarning
+	LogError
+)
 
 // Logger TODO docs
 type Logger struct {
-	outs []io.Writer
+	stdout bool
+	file   *os.File
+	lvl    int
 }
 
 var logger *Logger
 
 // NewLogger TODO docs
-func NewLogger() *Logger {
+func NewLogger(lvl int) *Logger {
 	if logger != nil {
 		return logger
 	}
 
-	fp, err := os.Open(filepath.Join(NewDirectoryService().RootPath, logFile))
+	filename := filepath.Join(NewDirectoryService().RootPath, logFile)
+
+	fp, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	logger = &Logger{
-		outs: []io.Writer{
-			os.Stdout,
-			fp,
-		},
+		stdout: true,
+		file:   fp,
+		lvl:    lvl,
 	}
 
 	if err != nil {
@@ -36,8 +45,67 @@ func NewLogger() *Logger {
 	return logger
 }
 
+// Verbose TODO docs
+func (l Logger) Verbose(msg string) {
+	l.Write(LogVerbose, msg)
+}
+
+// Info TODO docs
+func (l Logger) Info(msg string) {
+	l.Write(LogInfo, msg)
+}
+
 // Warning TODO docs
 func (l Logger) Warning(msg string) {
-	msg = "[WARNING] " + msg
-	PrintlnColor("yellow+h", msg)
+	l.Write(LogWarning, msg)
+}
+
+// Error TODO docs
+func (l Logger) Error(msg string) {
+	l.Write(LogError, msg)
+}
+
+// Write TODO docs
+func (l Logger) Write(lvl int, msg string) {
+	if lvl < l.lvl {
+		return
+	}
+
+	msg = fmt.Sprintf("[%s] %s\n", l.level(lvl), msg)
+
+	if l.stdout {
+		if color := l.color(lvl); color == "" {
+			Print(msg)
+		} else {
+			PrintColor(color, msg)
+		}
+	}
+
+	l.file.WriteString(msg)
+}
+
+func (l Logger) color(lvl int) string {
+	switch lvl {
+	case LogVerbose:
+		return "lightblack+h"
+	case LogInfo:
+		return "cyan+h"
+	case LogWarning:
+		return "yellow+h"
+	case LogError:
+		return "red+h"
+	}
+	return ""
+}
+
+func (l Logger) level(lvl int) string {
+	switch lvl {
+	case LogVerbose:
+		return "VERBOSE"
+	case LogWarning:
+		return "WARNING"
+	case LogError:
+		return "ERROR"
+	}
+	return "INFO"
 }
