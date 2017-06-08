@@ -12,7 +12,11 @@ const (
 	LogInfo
 	LogWarning
 	LogError
+	LogNone
 )
+
+// LogLevel TODO docs
+var LogLevel = LogVerbose
 
 // Logger TODO docs
 type Logger struct {
@@ -23,8 +27,8 @@ type Logger struct {
 
 var logger *Logger
 
-// NewLogger TODO docs
-func NewLogger(lvl int) *Logger {
+// GetLogger TODO docs
+func GetLogger() *Logger {
 	if logger != nil {
 		return logger
 	}
@@ -35,7 +39,7 @@ func NewLogger(lvl int) *Logger {
 	logger = &Logger{
 		stdout: true,
 		file:   fp,
-		lvl:    lvl,
+		lvl:    LogLevel,
 	}
 
 	if err != nil {
@@ -106,6 +110,8 @@ func (l Logger) level(lvl int) string {
 		return "WARNING"
 	case LogError:
 		return "ERROR"
+	case LogInfo:
+		return "INFO"
 	}
-	return "INFO"
+	return ""
 }

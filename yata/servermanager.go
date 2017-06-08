@@ -50,6 +50,7 @@ type GoogleDriveManager struct {
 func NewServerManager(serverType int) ServerManager {
 	switch serverType {
 	case GoogleDrive:
+		GetLogger().Verbose("creating google-drive service")
 		m := &GoogleDriveManager{
 			cfgMgr: NewConfigManager(),
 		}
@@ -72,6 +73,8 @@ func (m NoServerManager) Fetch() error {
 
 // Push TODO docs
 func (m GoogleDriveManager) Push() error {
+	GetLogger().Verbose("pushing tasks to google-drive")
+
 	fileList, err := m.appDataFiles()
 	if err != nil {
 		return err
@@ -79,6 +82,8 @@ func (m GoogleDriveManager) Push() error {
 
 	for _, pf := range PushableFiles {
 		var found bool
+
+		GetLogger().Verbose("pushing " + pf.Name)
 
 		fileMetadata := drive.File{
 			Name: pf.Name,
@@ -106,6 +111,7 @@ func (m GoogleDriveManager) Push() error {
 		}
 
 		if !found {
+			GetLogger().Verbose("creating appData file")
 			fileMetadata.Parents = []string{"appDataFolder"}
 			_, err = m.srv.Files.Create(&fileMetadata).Media(file).Do()
 			if err != nil {
@@ -119,6 +125,7 @@ func (m GoogleDriveManager) Push() error {
 
 // Fetch TODO docs
 func (m GoogleDriveManager) Fetch() error {
+	GetLogger().Verbose("fetching tasks to google-drive")
 	NewDirectoryService().ClearFetchFiles()
 
 	fileList, err := m.appDataFiles()
@@ -132,6 +139,8 @@ func (m GoogleDriveManager) Fetch() error {
 			return err
 		}
 
+		GetLogger().Verbose("fetching " + f.Name)
+
 		buf := make([]byte, 1024)
 		path := filepath.Join(NewDirectoryService().GetFetchPath(), f.Name)
 		for {
@@ -139,6 +148,8 @@ func (m GoogleDriveManager) Fetch() error {
 			if err != nil && err != io.EOF {
 				return err
 			}
+
+			GetLogger().Verbose("data <<<<<\n" + string(buf) + "\n>>>> data")
 
 			if n == 0 {
 				break
