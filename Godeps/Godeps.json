@@ -36,6 +36,11 @@
 			"Rev": "75fb7ed4208cf72d323d7d02fd1a5964a7a9073c"
 		},
 		{
+			"ImportPath": "github.com/tuxagon/yata-cli/cmd",
+			"Comment": "v1.0",
+			"Rev": "cbf7796a4f8915f9ffe962a32f6b280e0ab306fd"
+		},
+		{
 			"ImportPath": "github.com/tuxagon/yata-cli/yata",
 			"Comment": "v1.0",
 			"Rev": "cbf7796a4f8915f9ffe962a32f6b280e0ab306fd"
