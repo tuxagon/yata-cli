@@ -4,42 +4,51 @@ import (
 	"sort"
 	"strings"
 
-	"yata-cli/yata"
-
-	//"github.com/tuxagon/yata-cli/task"
-
+	"github.com/tuxagon/yata-cli/yata"
 	"github.com/urfave/cli"
 )
 
+type listArgs struct {
+	sort        string
+	all         bool
+	showTags    bool
+	tag         string
+	description string
+	format      string
+}
+
+func (a *listArgs) Parse(ctx *cli.Context) {
+	a.sort = ctx.String("sort")
+	a.all = ctx.Bool("all")
+	a.showTags = ctx.Bool("show-tags")
+	a.tag = ctx.String("tag")
+	a.description = ctx.String("description")
+	a.format = ctx.String("format")
+}
+
 // List returns the list of tasks/todos that have been recorded
 func List(ctx *cli.Context) error {
-	sort := ctx.String("sort")
-	showAll := ctx.Bool("all")
-	showTag := ctx.Bool("show-tags")
-	searchTag := ctx.String("tag")
-	searchDesc := ctx.String("description")
-	format := ctx.String("format")
+	args := &listArgs{}
+	args.Parse(ctx)
 
 	manager := yata.NewTaskManager()
 	tasks, err := manager.GetAll()
-	if err != nil {
-		return err
-	}
+	handleError(err)
 
-	if showTag {
+	if args.showTags {
 		return displayTags(tasks)
 	}
 
 	tasks = yata.FilterTasks(tasks, func(t yata.Task) bool {
-		return (searchTag == "" || sliceContains(t.Tags, searchTag)) &&
-			(searchDesc == "" || strings.Contains(t.Description, searchDesc)) &&
-			(showAll || !t.Completed)
+		return (args.tag == "" || sliceContains(t.Tags, args.tag)) &&
+			(args.description == "" || strings.Contains(t.Description, args.description)) &&
+			(args.all || !t.Completed)
 	})
 
-	sortTasks(sort, &tasks)
+	sortTasks(args.sort, &tasks)
 
 	for _, v := range tasks {
-		stringer := yata.NewTaskStringer(v, getStringerType(format))
+		stringer := yata.NewTaskStringer(v, taskStringer(args.format))
 		switch v.Priority {
 		case yata.LowPriority:
 			yata.PrintlnColor("cyan+h", stringer.String())
@@ -49,6 +58,7 @@ func List(ctx *cli.Context) error {
 			yata.Println(stringer.String())
 		}
 	}
+
 	return nil
 }
 
@@ -105,13 +115,4 @@ func sliceContains(arr []string, term string) bool {
 	}
 
 	return false
-}
-
-func getStringerType(format string) int8 {
-	switch strings.ToLower(format) {
-	case "json":
-		return yata.JSON
-	default:
-		return yata.Simple
-	}
 }

@@ -1,19 +1,23 @@
 package cmd
 
 import (
-	"yata-cli/yata"
-
+	"github.com/tuxagon/yata-cli/yata"
 	"github.com/urfave/cli"
 )
 
-// Delete Deletes a task
+type deleteArgs struct {
+	id int
+}
+
+func (a *deleteArgs) Parse(ctx *cli.Context) {
+	a.id = parseIDWithIndex(ctx, 0)
+}
+
+// Delete deletes a task
 func Delete(ctx *cli.Context) error {
-	id, err := promptForID(ctx)
-	if err != nil {
-		yata.PrintlnColor("red+h", err.Error())
-	}
+	args := &deleteArgs{}
+	args.Parse(ctx)
 
 	manager := yata.NewTaskManager()
-
-	return manager.DeleteByID(uint32(id))
+	return manager.DeleteByID(uint32(args.id))
 }
