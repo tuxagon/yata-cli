@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-const logFile = ".yatalog"
+const logFilename = ".yatalog"
 const (
 	LogVerbose = iota
 	LogInfo
@@ -15,28 +15,44 @@ const (
 	LogNone
 )
 
-// LogLevel TODO docs
-var LogLevel = LogVerbose
+// LogLevel represents the lowest level of
+// logging the user wants displayed during
+// the execution of the app
+var LogLevel = LogInfo
 
-// Logger TODO docs
-type Logger struct {
+// Logger provides the contract for logging
+// verbose, info, warning, and error messages
+// using a pre-defined heirarchy
+type Logger interface {
+	Verbose(string)
+	Info(string)
+	Warning(string)
+	Error(string)
+	Write(int, string)
+}
+
+var logger Logger
+
+// FileLogger TODO docs
+type FileLogger struct {
 	stdout bool
 	file   *os.File
 	lvl    int
 }
 
-var logger *Logger
-
-// GetLogger TODO docs
-func GetLogger() *Logger {
+// GetLogger gets the configured logger or if a logger is
+// not set, will create a new FileLogger
+func GetLogger() Logger {
 	if logger != nil {
 		return logger
 	}
 
-	filename := filepath.Join(NewDirectoryService().RootPath, logFile)
+	path := filepath.Join(GetDirectory().MetadataDir(), "logs")
+	HandleError(mkdir(path)(), false)
+	filename := filepath.Join(path, logFilename)
 
 	fp, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
-	logger = &Logger{
+	logger = &FileLogger{
 		stdout: true,
 		file:   fp,
 		lvl:    LogLevel,
@@ -50,27 +66,27 @@ func GetLogger() *Logger {
 }
 
 // Verbose TODO docs
-func (l Logger) Verbose(msg string) {
+func (l FileLogger) Verbose(msg string) {
 	l.Write(LogVerbose, msg)
 }
 
 // Info TODO docs
-func (l Logger) Info(msg string) {
+func (l FileLogger) Info(msg string) {
 	l.Write(LogInfo, msg)
 }
 
 // Warning TODO docs
-func (l Logger) Warning(msg string) {
+func (l FileLogger) Warning(msg string) {
 	l.Write(LogWarning, msg)
 }
 
 // Error TODO docs
-func (l Logger) Error(msg string) {
+func (l FileLogger) Error(msg string) {
 	l.Write(LogError, msg)
 }
 
 // Write TODO docs
-func (l Logger) Write(lvl int, msg string) {
+func (l FileLogger) Write(lvl int, msg string) {
 	if lvl < l.lvl {
 		return
 	}
@@ -88,7 +104,7 @@ func (l Logger) Write(lvl int, msg string) {
 	l.file.WriteString(msg)
 }
 
-func (l Logger) color(lvl int) string {
+func (l FileLogger) color(lvl int) string {
 	switch lvl {
 	case LogVerbose:
 		return "lightblack+h"
@@ -102,7 +118,7 @@ func (l Logger) color(lvl int) string {
 	return ""
 }
 
-func (l Logger) level(lvl int) string {
+func (l FileLogger) level(lvl int) string {
 	switch lvl {
 	case LogVerbose:
 		return "VERBOSE"

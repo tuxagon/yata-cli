@@ -7,6 +7,6 @@ import (
 
 // Merge TODO docs
 func Merge(ctx *cli.Context) error {
-	handleError(yata.NewTaskManager().MergeFetchFiles())
+	yata.NewTaskManager().MergeFetchFiles()
 	return nil
 }

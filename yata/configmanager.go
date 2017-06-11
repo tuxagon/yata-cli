@@ -69,8 +69,7 @@ func (m ConfigManager) GetValueForKey(key string) (value string, err error) {
 
 // GetAll TODO docs
 func (m ConfigManager) GetAll() (values map[string]string, err error) {
-	dirService := NewDirectoryService()
-	dat, err := dirService.GetConfig()
+	dat, err := GetDirectory().Config()
 	if err != nil {
 		return nil, err
 	}
@@ -98,21 +97,19 @@ func (m ConfigManager) SetKey(key string, value interface{}) error {
 	}
 	json.Unmarshal(dat, &m.Config)
 
-	dirService := NewDirectoryService()
 	dat, err = json.MarshalIndent(m.Config, "", "\t")
 	if err != nil {
 		return err
 	}
 
-	dirService.WriteConfig(dat)
+	GetDirectory().WriteConfig(dat)
 
 	return nil
 }
 
 // LoadConfig TODO docs
 func (m *ConfigManager) LoadConfig() {
-	dirService := NewDirectoryService()
-	dat, err := dirService.GetConfig()
+	dat, err := GetDirectory().Config()
 	if err != nil {
 		m.Config = DefaultConfig()
 	}

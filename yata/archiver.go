@@ -26,8 +26,7 @@ func NewArchiver() *Archiver {
 
 // Zip TODO docs
 func (a Archiver) Zip() error {
-	dirService := NewDirectoryService()
-	fw, err := os.Create(filepath.Join(dirService.RootPath, archiveFilename+".zip"))
+	fw, err := os.Create(filepath.Join(GetDirectory().Root, archiveFilename+".zip"))
 	w := zip.NewWriter(fw)
 	defer w.Close()
 
@@ -52,11 +51,10 @@ func (a Archiver) Zip() error {
 
 // getArchivableFiles TODO docs
 func (a Archiver) getArchivableFiles() ([]archivableFile, error) {
-	dirService := NewDirectoryService()
 	files := make([]archivableFile, 0)
 	filenames := []string{
-		dirService.GetFullPath(),
-		dirService.GetFullIDPath(),
+		GetDirectory().TasksFilePath(),
+		GetDirectory().IDPath(),
 	}
 
 	for _, f := range filenames {
@@ -65,7 +63,7 @@ func (a Archiver) getArchivableFiles() ([]archivableFile, error) {
 			return nil, err
 		}
 		files = append(files, archivableFile{
-			Filename: stripPath(dirService.RootPath+"/", f),
+			Filename: stripPath(GetDirectory().Root+"/", f),
 			Contents: dat,
 		})
 	}

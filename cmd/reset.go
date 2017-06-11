@@ -27,7 +27,7 @@ func Reset(ctx *cli.Context) error {
 		manager.Backup()
 	}
 
-	handleError(manager.Reset(!args.keepID))
+	manager.Reset(!args.keepID)
 
 	return nil
 }

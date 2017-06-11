@@ -17,9 +17,8 @@ type TaskManager struct {
 
 // NewTaskManager TODO docs
 func NewTaskManager() *TaskManager {
-	dirService := NewDirectoryService()
 	return &TaskManager{
-		Database:   NewDatabase(dirService.RootPath),
+		Database:   NewDatabase(GetDirectory().Root),
 		Collection: "tasks",
 	}
 }
@@ -86,15 +85,13 @@ func (m TaskManager) DeleteByID(id uint32) error {
 }
 
 // Backup TODO docs
-func (m TaskManager) Backup() error {
-	dirService := NewDirectoryService()
-	return dirService.Backup()
+func (m TaskManager) Backup() {
+	GetDirectory().Backup()
 }
 
 // Reset TODO docs
-func (m TaskManager) Reset(resetID bool) error {
-	dirService := NewDirectoryService()
-	return dirService.Reset(resetID)
+func (m TaskManager) Reset(resetID bool) {
+	GetDirectory().Reset(resetID)
 }
 
 // Prune TODO docs
@@ -112,18 +109,14 @@ func (m TaskManager) Prune() error {
 }
 
 // MergeFetchFiles TODO docs
-func (m TaskManager) MergeFetchFiles() error {
-	fetchDB := NewDatabase(NewDirectoryService().GetFetchPath())
+func (m TaskManager) MergeFetchFiles() {
+	fetchDB := NewDatabase(GetDirectory().FetchDir())
 	fetchTasks := make([]Task, 0)
 	fetchDB.Read(m.Collection, &fetchTasks)
 	tasks, err := m.GetAll()
-	if err != nil {
-		return err
-	}
-	maxID, err := NewDirectoryService().GetCurrentID()
-	if err != nil {
-		return err
-	}
+	HandleError(err, true)
+
+	maxID := GetDirectory().CurrentID()
 
 	hasUUID := func(tasks []Task, uuid string) bool {
 		for _, t := range tasks {
@@ -157,19 +150,15 @@ func (m TaskManager) MergeFetchFiles() error {
 		}
 	}
 
-	NewDirectoryService().WriteID(maxID)
+	GetDirectory().WriteID(maxID)
 
-	return m.Database.Write(m.Collection, tasks)
+	HandleError(m.Database.Write(m.Collection, tasks), true)
 }
 
 // changeIDIfZero TODO docs
 func changeIDIfZero(t *Task) error {
-	dirService := NewDirectoryService()
 	if t.ID == 0 {
-		newID, err := dirService.GetAndIncreaseID()
-		if err != nil {
-			return err
-		}
+		newID := GetDirectory().IncrementID()
 		t.ID = newID
 	}
 	return nil
