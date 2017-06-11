@@ -37,13 +37,13 @@
 		},
 		{
 			"ImportPath": "github.com/tuxagon/yata-cli/cmd",
-			"Comment": "v1.0-14-g852efdb",
-			"Rev": "852efdb94c65a13ea66e75aea281f56e8f6eb513"
+			"Comment": "v1.0-17-gdf8896a",
+			"Rev": "df8896a3817d76ed1a1321a260a5dc66021108e5"
 		},
 		{
 			"ImportPath": "github.com/tuxagon/yata-cli/yata",
-			"Comment": "v1.0-14-g852efdb",
-			"Rev": "852efdb94c65a13ea66e75aea281f56e8f6eb513"
+			"Comment": "v1.0-17-gdf8896a",
+			"Rev": "df8896a3817d76ed1a1321a260a5dc66021108e5"
 		},
 		{
 			"ImportPath": "github.com/urfave/cli",
