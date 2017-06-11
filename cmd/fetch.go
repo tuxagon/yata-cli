@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	//"github.com/tuxagon/yata-cli/yata"
-	"yata-cli/yata"
-
+	"github.com/tuxagon/yata-cli/yata"
 	"github.com/urfave/cli"
 )
 
