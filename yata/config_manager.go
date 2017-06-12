@@ -109,6 +109,8 @@ func (m ConfigManager) SetKey(key string, value interface{}) error {
 
 // LoadConfig TODO docs
 func (m *ConfigManager) LoadConfig() {
+	GetLogger().Verbose("Loading config")
+
 	dat, err := GetDirectory().Config()
 	if err != nil {
 		m.Config = DefaultConfig()
@@ -120,6 +122,8 @@ func (m *ConfigManager) LoadConfig() {
 	}
 
 	m.Config = config
+
+	GetLogger().Verbose("Config loaded")
 }
 
 // DefaultConfig TODO docs

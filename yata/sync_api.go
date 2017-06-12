@@ -47,7 +47,7 @@ func (m NoneAPI) Fetch() {
 func NewSyncAPI(serverType int) SyncAPI {
 	switch serverType {
 	case GoogleDrive:
-		GetLogger().Verbose("creating google-drive service")
+		GetLogger().Verbose("Using Google Drive")
 		m := &DriveAPI{
 			cfgMgr: NewConfigManager(),
 		}

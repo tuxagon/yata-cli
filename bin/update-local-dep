@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e -x
+
+echo "Updating github.com/tuxagon/yata-cli"
+
+rm -rf $GOPATH/src/github.com/tuxagon/yata-cli
+cp -r $GOPATH/src/yata-cli $GOPATH/src/github.com/tuxagon/yata-cli
+
+godep go install ./...
+godep save
