@@ -7,7 +7,7 @@
 //   import "google.golang.org/api/drive/v3"
 //   ...
 //   driveService, err := drive.New(oauthHttpClient)
-package drive
+package drive // import "google.golang.org/api/drive/v3"
 
 import (
 	"bytes"
