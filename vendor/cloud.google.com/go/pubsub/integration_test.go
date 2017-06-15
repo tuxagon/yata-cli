@@ -20,9 +20,12 @@ import (
 	"testing"
 	"time"
 
+	gax "github.com/googleapis/gax-go"
+
 	"golang.org/x/net/context"
 
 	"cloud.google.com/go/iam"
+	"cloud.google.com/go/internal"
 	"cloud.google.com/go/internal/testutil"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -45,6 +48,7 @@ func extractMessageData(m *Message) *messageData {
 }
 
 func TestAll(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Integration tests skipped in short mode")
 	}
@@ -71,7 +75,7 @@ func TestAll(t *testing.T) {
 	defer topic.Stop()
 
 	var sub *Subscription
-	if sub, err = client.CreateSubscription(ctx, subName, topic, 0, nil); err != nil {
+	if sub, err = client.CreateSubscription(ctx, subName, SubscriptionConfig{Topic: topic}); err != nil {
 		t.Errorf("CreateSub error: %v", err)
 	}
 
@@ -152,28 +156,49 @@ func TestAll(t *testing.T) {
 		t.Fatalf("CreateSnapshot error: %v", err)
 	}
 
-	snapIt := client.snapshots(ctx)
-	for {
-		s, err := snapIt.Next()
-		if err == nil && s.name == snap.name {
-			break
+	timeoutCtx, _ = context.WithTimeout(ctx, time.Minute)
+	err = internal.Retry(timeoutCtx, gax.Backoff{}, func() (bool, error) {
+		snapIt := client.snapshots(timeoutCtx)
+		for {
+			s, err := snapIt.Next()
+			if err == nil && s.name == snap.name {
+				return true, nil
+			}
+			if err == iterator.Done {
+				return false, fmt.Errorf("cannot find snapshot: %q", snap.name)
+			}
+			if err != nil {
+				return false, err
+			}
 		}
-		if err == iterator.Done {
-			t.Errorf("cannot find snapshot: %q", snap.name)
-			break
-		}
-		if err != nil {
-			t.Error(err)
-			break
-		}
+	})
+	if err != nil {
+		t.Error(err)
 	}
 
-	if err := sub.seekToSnapshot(ctx, snap.snapshot); err != nil {
-		t.Errorf("SeekToSnapshot error: %v", err)
+	err = internal.Retry(timeoutCtx, gax.Backoff{}, func() (bool, error) {
+		err := sub.seekToSnapshot(timeoutCtx, snap.snapshot)
+		return err == nil, err
+	})
+	if err != nil {
+		t.Error(err)
 	}
 
-	if err := snap.delete(ctx); err != nil {
-		t.Errorf("DeleteSnap error: %v", err)
+	err = internal.Retry(timeoutCtx, gax.Backoff{}, func() (bool, error) {
+		err := sub.seekToTime(timeoutCtx, time.Now())
+		return err == nil, err
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = internal.Retry(timeoutCtx, gax.Backoff{}, func() (bool, error) {
+		snapHandle := client.snapshot(snap.ID())
+		err := snapHandle.delete(timeoutCtx)
+		return err == nil, err
+	})
+	if err != nil {
+		t.Error(err)
 	}
 
 	if err := sub.Delete(ctx); err != nil {
